@@ -1,0 +1,11 @@
+.metadata
+.classpath
+.project
+.cache
+*.prefs
+*.class
+*.log
+**/target/
+target
+.idea
+node_modules
