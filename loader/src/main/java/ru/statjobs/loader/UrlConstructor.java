@@ -11,7 +11,7 @@ public class UrlConstructor {
 
     public String hhVacancyUrlNextPage(String url) {
         String[] arr = url.split("&page=");
-        return arr[0] + "&page=" + Integer.valueOf(arr[1]) + 1;
+        return arr[0] + "&page=" + (Integer.valueOf(arr[1]) + 1);
     }
 
 

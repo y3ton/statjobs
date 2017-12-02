@@ -1,7 +1,9 @@
 package ru.statjobs.loader.handlers;
 
+import ru.statjobs.loader.dto.DownloadableLink;
+
 public interface LinkHandler {
 
-    void process(String url);
+    void process(DownloadableLink link);
 
 }

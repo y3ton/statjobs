@@ -36,15 +36,15 @@ public class HhListVacanciesHandler implements  LinkHandler {
     }
 
     @Override
-    public void process(String url) {
-        Downloader.DownloaderResult downloaderResult = downloader.download(url, StandardCharsets.UTF_8,DOWNLOAD_TIMEOUT);
+    public void process(DownloadableLink link) {
+        Downloader.DownloaderResult downloaderResult = downloader.download(link.getUrl(), StandardCharsets.UTF_8,DOWNLOAD_TIMEOUT);
         int responseCode = downloaderResult.getResponseCode();
         // hh page has no data
         if (responseCode == HttpURLConnection.HTTP_BAD_REQUEST) {
             return;
         }
         if (responseCode != HttpURLConnection.HTTP_OK) {
-            throw new RuntimeException("fail load url " + url + ". error code: " + responseCode);
+            throw new RuntimeException("fail load url " + link.getUrl() + ". error code: " + responseCode);
         }
         HashMap<String, Object> map = jsonUtils.readString(downloaderResult.getText());
         List<Map<String, Object>> items = (List<Map<String, Object>>) map.get("items");
@@ -52,11 +52,15 @@ public class HhListVacanciesHandler implements  LinkHandler {
         items.stream()
                 .map(item -> (String)item.get("url"))
                 .filter(StringUtils::isNotBlank)
-                .map(urlVacancy -> new DownloadableLink(urlVacancy, UrlHandler.HH_VACANCY.name()))
+                .map(urlVacancy -> new DownloadableLink(urlVacancy, link.getSequenceNum(), UrlHandler.HH_VACANCY.name()))
                 .forEach(queueDownloadableLinkDao::createDownloadableLink);
 
-        DownloadableLink nextLink = new DownloadableLink(urlConstructor.hhVacancyUrlNextPage(url), UrlHandler.HH_VACANCY.name());
+        DownloadableLink nextLink = new DownloadableLink(
+                urlConstructor.hhVacancyUrlNextPage(link.getUrl()),
+                link.getSequenceNum(),
+                UrlHandler.HH_LIST_VACANCIES.name()
+        );
         queueDownloadableLinkDao.createDownloadableLink(nextLink);
-        queueDownloadableLinkDao.deleteDownloadableLink(url);
+        queueDownloadableLinkDao.deleteDownloadableLink(link);
     }
 }

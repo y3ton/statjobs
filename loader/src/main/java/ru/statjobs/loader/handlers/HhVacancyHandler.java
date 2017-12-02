@@ -2,6 +2,7 @@ package ru.statjobs.loader.handlers;
 
 import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
 import ru.statjobs.loader.dao.RawDataStorageDao;
+import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.utils.Downloader;
 
 import java.net.HttpURLConnection;
@@ -25,13 +26,13 @@ public class HhVacancyHandler implements LinkHandler{
     }
 
     @Override
-    public void process(String url) {
-        Downloader.DownloaderResult downloaderResult = downloader.download(url, StandardCharsets.UTF_8, DOWNLOAD_TIMEOUT);
+    public void process(DownloadableLink link) {
+        Downloader.DownloaderResult downloaderResult = downloader.download(link.getUrl(), StandardCharsets.UTF_8, DOWNLOAD_TIMEOUT);
         int responseCode = downloaderResult.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_OK) {
-            throw new RuntimeException("fail load url " + url + ". error code: " + responseCode);
+            throw new RuntimeException("fail load url " + link.getUrl() + ". error code: " + responseCode);
         }
-        rawDataStorageDao.saveHhVacancy(url, downloaderResult.getText());
-        queueDownloadableLinkDao.deleteDownloadableLink(url);
+        rawDataStorageDao.saveHhVacancy(link, downloaderResult.getText());
+        queueDownloadableLinkDao.deleteDownloadableLink(link);
     }
 }

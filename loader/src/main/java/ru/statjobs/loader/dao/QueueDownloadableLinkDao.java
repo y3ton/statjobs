@@ -4,9 +4,9 @@ import ru.statjobs.loader.dto.DownloadableLink;
 
 public interface QueueDownloadableLinkDao {
 
-    boolean createDownloadableLink(DownloadableLink downloadableLink);
+    boolean createDownloadableLink(DownloadableLink link);
 
-    boolean deleteDownloadableLink(String url);
+    boolean deleteDownloadableLink(DownloadableLink link);
 
     DownloadableLink getDownloadableLink();
 }

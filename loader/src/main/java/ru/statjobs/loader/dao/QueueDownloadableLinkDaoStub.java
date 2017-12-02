@@ -10,17 +10,17 @@ public class QueueDownloadableLinkDaoStub implements QueueDownloadableLinkDao  {
     private Map<String, DownloadableLink> map = new HashMap<>();
 
     @Override
-    public boolean createDownloadableLink(DownloadableLink downloadableLink) {
-        if (map.containsKey(downloadableLink.getUrl())){
+    public boolean createDownloadableLink(DownloadableLink link) {
+        if (map.containsKey(link.getUrl())){
             return false;
         }
-        map.put(downloadableLink.getUrl(), downloadableLink);
+        map.put(link.getUrl(), link);
         return true;
     }
 
     @Override
-    public boolean deleteDownloadableLink(String url) {
-        return map.remove(url) != null;
+    public boolean deleteDownloadableLink(DownloadableLink link) {
+        return map.remove(link.getUrl()) != null;
     }
 
     @Override
