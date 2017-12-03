@@ -35,6 +35,7 @@ public class App {
     private List<HhDictionary> industries;
     private Map<String, String> cities;
     private Map<String, String> experience;
+    private InitUrlCreator initUrlCreator;
 
     public static void main(String[] args) throws IOException, SQLException {
         new App().process();
@@ -59,7 +60,7 @@ public class App {
                 .filter(spec-> "Разработка программного обеспечения".equals(spec.getItem()))
                 .collect(Collectors.toList());
         experience = hhDictionaryDao.getExperience();
-
+        initUrlCreator = new InitUrlCreator();
     }
 
     private void process() {
@@ -72,7 +73,7 @@ public class App {
             init(connection);
             // create base hh url
             int sequenceNum = (int) Instant.now().getEpochSecond();
-            List<DownloadableLink> firstLink = initHhLink(cities, specialization, experience, industries, urlConstructor, sequenceNum);
+            List<DownloadableLink> firstLink = initUrlCreator.initHhLink(PER_PAGE, cities, specialization, experience, industries, urlConstructor, sequenceNum);
             firstLink.forEach(queueDownloadableLinkDao::createDownloadableLink);
             Map<UrlHandler, LinkHandler> locatorHandlers = createUrlHandlerLocator();
             processLink(queueDownloadableLinkDao, locatorHandlers);
@@ -100,35 +101,6 @@ public class App {
                         UrlHandler.HH_VACANCY,
                         new HhVacancyHandler(downloader, rawDataStorageDao, queueDownloadableLinkDao)))
                 .collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
-    }
-
-
-    private List<DownloadableLink> initHhLink(
-            Map<String, String> cities,
-            List<HhDictionary> specialization,
-            Map<String, String> experience,
-            List<HhDictionary> industries,
-            UrlConstructor urlConstructor,
-            int sequenceNum
-    ) {
-        return cities.values().stream()
-                .map(city ->  specialization.stream()
-                        .map(spec -> experience.values().stream()
-                                .map(exp -> industries.stream()
-                                    .map(ind -> urlConstructor.createHhVacancyUrl(
-                                            spec.getCode(),
-                                            null,
-                                            city,
-                                            exp,
-                                            ind.getCode(),
-                                            0,
-                                            PER_PAGE))
-                                    .map(url -> new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_VACANCIES.name()))
-                                )
-                                .flatMap(l -> l))
-                        .flatMap(l -> l))
-                .flatMap(l -> l)
-                .collect(Collectors.toList());
     }
 
     private Properties loadProperties() {
