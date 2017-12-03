@@ -1,11 +1,9 @@
 package ru.statjobs.loader.dao;
 
 
-
-import ru.statjobs.loader.dto.HhSpecialization;
+import ru.statjobs.loader.dto.HhDictionary;
 import ru.statjobs.loader.utils.JsonUtils;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -13,6 +11,7 @@ import java.util.stream.Stream;
 public class HhDictionaryDaoImpl implements HhDictionaryDao {
 
     public final static String FILE_SPECIALIZATIONS = "dictionary/specializations.json";
+    public final static String FILE_INDUSTRIES = "dictionary/industries.json";
 
     private final static Map<String, String> EXPERIENCE = Collections.unmodifiableMap(Stream.of(
             new AbstractMap.SimpleEntry<>("Нет опыта", "noExperience"),
@@ -34,7 +33,8 @@ public class HhDictionaryDaoImpl implements HhDictionaryDao {
 
     private final JsonUtils jsonUtils;
 
-    private List<HhSpecialization> specializations;
+    private List<HhDictionary> specializations;
+    private List<HhDictionary> industries;
 
     public HhDictionaryDaoImpl(JsonUtils jsonUtils) {
         this.jsonUtils = jsonUtils;
@@ -51,29 +51,30 @@ public class HhDictionaryDaoImpl implements HhDictionaryDao {
     }
 
     @Override
-    public List<HhSpecialization> getSpecialization() {
+    public List<HhDictionary> getIndustries() {
+        if (industries == null) {
+            industries = loadDictionary(FILE_INDUSTRIES, "industries");
+        }
+        return industries;
+    }
+
+    @Override
+    public List<HhDictionary> getSpecialization() {
         if (specializations == null) {
-            try {
-                specializations = loadSpecialization();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            specializations = loadDictionary(FILE_SPECIALIZATIONS, "specializations");
         }
         return specializations;
     }
 
-    private List<HhSpecialization> loadSpecialization() throws IOException {
-        List<Map<String, Object>> list = jsonUtils.readResource(FILE_SPECIALIZATIONS);
+    private List<HhDictionary> loadDictionary(String fileName, String groupItemName) {
+        List<Map<String, Object>> list = jsonUtils.readResource(fileName);
         return list.stream()
-                .map(mapGropSpec -> ((List<Map<String, String>>)mapGropSpec.get("specializations")).stream()
-                        .map(specMap -> new HhSpecialization((String)mapGropSpec.get("name"), specMap.get("name"), specMap.get("id")))
+                .map(mapGropSpec -> ((List<Map<String, String>>)mapGropSpec.get(groupItemName)).stream()
+                        .map(specMap -> new HhDictionary((String)mapGropSpec.get("name"), specMap.get("name"), specMap.get("id")))
                         .collect(Collectors.toList())
                 )
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
-
-
-
 
 }

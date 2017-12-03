@@ -3,15 +3,18 @@ package ru.statjobs.loader;
 
 import ru.statjobs.loader.dao.*;
 import ru.statjobs.loader.dto.DownloadableLink;
-import ru.statjobs.loader.dto.HhSpecialization;
+import ru.statjobs.loader.dto.HhDictionary;
 import ru.statjobs.loader.handlers.HhListVacanciesHandler;
 import ru.statjobs.loader.handlers.HhVacancyHandler;
 import ru.statjobs.loader.handlers.LinkHandler;
 import ru.statjobs.loader.utils.Downloader;
 import ru.statjobs.loader.utils.JsonUtils;
 
-import java.io.*;
-import java.sql.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,7 +23,6 @@ import java.util.stream.Stream;
 public class App {
 
     public static final Integer PER_PAGE = 100;
-    public static final Integer SEARCH_PERIOD = 1;
     public static final String PROPERTIES_FILE = "app.properties";
 
     private Downloader downloader;
@@ -29,7 +31,8 @@ public class App {
     private QueueDownloadableLinkDao queueDownloadableLinkDao;
     private RawDataStorageDao rawDataStorageDao;
     private HhDictionaryDao hhDictionaryDao;
-    private List<HhSpecialization> specialization;
+    private List<HhDictionary> specialization;
+    private List<HhDictionary> industries;
     private Map<String, String> cities;
     private Map<String, String> experience;
 
@@ -46,12 +49,15 @@ public class App {
         rawDataStorageDao = new RawDataStorageDaoImpl(connection);
         hhDictionaryDao = new HhDictionaryDaoImpl(jsonUtils);
         specialization = hhDictionaryDao.getSpecialization().stream()
-                .filter(spec-> "Информационные технологии, интернет, телеком".equals(spec.getSpecializationGroup()))
-                .filter(spec-> "Программирование, Разработка".equals(spec.getSpecialization()))
+                .filter(spec-> "Информационные технологии, интернет, телеком".equals(spec.getItemGroup()))
+                .filter(spec-> "Программирование, Разработка".equals(spec.getItem()))
                 .collect(Collectors.toList());
         cities = hhDictionaryDao.getCity().entrySet().stream()
                 .filter(map -> map.getKey().equals("Москва"))
                 .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
+        industries = hhDictionaryDao.getIndustries().stream()
+                .filter(spec-> "Разработка программного обеспечения".equals(spec.getItem()))
+                .collect(Collectors.toList());
         experience = hhDictionaryDao.getExperience();
 
     }
@@ -66,7 +72,7 @@ public class App {
             init(connection);
             // create base hh url
             int sequenceNum = (int) Instant.now().getEpochSecond();
-            List<DownloadableLink> firstLink = initHhLink(cities, specialization, experience, urlConstructor, sequenceNum);
+            List<DownloadableLink> firstLink = initHhLink(cities, specialization, experience, industries, urlConstructor, sequenceNum);
             firstLink.forEach(queueDownloadableLinkDao::createDownloadableLink);
             Map<UrlHandler, LinkHandler> locatorHandlers = createUrlHandlerLocator();
             processLink(queueDownloadableLinkDao, locatorHandlers);
@@ -99,17 +105,27 @@ public class App {
 
     private List<DownloadableLink> initHhLink(
             Map<String, String> cities,
-            List<HhSpecialization> specialization,
+            List<HhDictionary> specialization,
             Map<String, String> experience,
+            List<HhDictionary> industries,
             UrlConstructor urlConstructor,
             int sequenceNum
     ) {
         return cities.values().stream()
                 .map(city ->  specialization.stream()
                         .map(spec -> experience.values().stream()
-                                .map(exp -> urlConstructor.createHhVacancyUrl(spec.getCode(), SEARCH_PERIOD, city, exp, 0, PER_PAGE))
-                                .map(url -> new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_VACANCIES.name()))
-                        )
+                                .map(exp -> industries.stream()
+                                    .map(ind -> urlConstructor.createHhVacancyUrl(
+                                            spec.getCode(),
+                                            null,
+                                            city,
+                                            exp,
+                                            ind.getCode(),
+                                            0,
+                                            PER_PAGE))
+                                    .map(url -> new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_VACANCIES.name()))
+                                )
+                                .flatMap(l -> l))
                         .flatMap(l -> l))
                 .flatMap(l -> l)
                 .collect(Collectors.toList());
