@@ -18,9 +18,12 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
 
     @Override
     public boolean createDownloadableLink(DownloadableLink link) {
+        if (isContainsDownloadableLink(link)) {
+            return false;
+        }
         String query =
-                "insert into \"T_QUEUE_DOWNLOADABLE_LINK\"(\"HANDLER_NAME\", \"URL\", \"DATE_CREATE\", \"SEQUENCE_NUM\") " +
-                "values (?, ?, ?, ?)";
+                "insert into T_QUEUE_DOWNLOADABLE_LINK(HANDLER_NAME, URL, DATE_CREATE, SEQUENCE_NUM, IS_DELETE) " +
+                "values (?, ?, ?, ?, FALSE)";
         try (PreparedStatement preparedStatement = connection.prepareStatement (query)) {
             preparedStatement.setString(1, link.getHandlerName());
             preparedStatement.setString(2, link.getUrl());
@@ -32,11 +35,34 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
         }
     }
 
-    @Override
-    public boolean deleteDownloadableLink(DownloadableLink link) {
-        String query = "delete from \"T_QUEUE_DOWNLOADABLE_LINK\" WHERE \"URL\" = ? and \"DATE_PROCESS\" is not null";
+    private boolean isContainsDownloadableLink(DownloadableLink link) {
+        String query = "select ID " +
+                "from  T_QUEUE_DOWNLOADABLE_LINK " +
+                "where URL = ? and SEQUENCE_NUM = ? " +
+                "limit 1";
+
         try (PreparedStatement preparedStatement = connection.prepareStatement (query)) {
             preparedStatement.setString(1, link.getUrl());
+            preparedStatement.setInt(2, link.getSequenceNum() );
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @Override
+    public boolean deleteDownloadableLink(DownloadableLink link) {
+        String query = "update T_QUEUE_DOWNLOADABLE_LINK " +
+                "set  IS_DELETE=TRUE " +
+                "where URL=? and SEQUENCE_NUM=? and IS_DELETE != true and DATE_PROCESS is not null";
+        try (PreparedStatement preparedStatement = connection.prepareStatement (query)) {
+            preparedStatement.setString(1, link.getUrl());
+            preparedStatement.setInt(2, link.getSequenceNum() );
             return preparedStatement.executeUpdate() > 0;
         }
         catch (SQLException e) {
@@ -59,7 +85,7 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
     }
 
     private boolean updateDownloadableLinkDateProcess(Integer id, Timestamp dateProcess) {
-        String query = "UPDATE \"T_QUEUE_DOWNLOADABLE_LINK\" SET \"DATE_PROCESS\"=? WHERE \"ID\"=? and \"DATE_PROCESS\" is null";
+        String query = "UPDATE T_QUEUE_DOWNLOADABLE_LINK SET DATE_PROCESS=? WHERE ID=? and DATE_PROCESS is null";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setTimestamp(1, dateProcess);
             preparedStatement.setInt(2, id);
@@ -70,9 +96,9 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
     }
 
     private Pair<Integer, DownloadableLink> selectRandomDownloadableLink() {
-        String query = "select \"ID\", \"HANDLER_NAME\", \"URL\", \"SEQUENCE_NUM\" " +
-                "from \"T_QUEUE_DOWNLOADABLE_LINK\" " +
-                "where \"DATE_PROCESS\" is null " +
+        String query = "select ID, HANDLER_NAME, URL, SEQUENCE_NUM " +
+                "from T_QUEUE_DOWNLOADABLE_LINK " +
+                "where DATE_PROCESS is null and IS_DELETE <> true " +
                 "order by random() limit 1";
         try (
                 PreparedStatement preparedStatement = connection.prepareStatement(query);

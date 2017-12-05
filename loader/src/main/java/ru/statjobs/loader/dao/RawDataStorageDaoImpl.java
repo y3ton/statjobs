@@ -2,7 +2,9 @@ package ru.statjobs.loader.dao;
 
 import ru.statjobs.loader.dto.DownloadableLink;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.Instant;
 
 public class RawDataStorageDaoImpl implements RawDataStorageDao {
@@ -15,7 +17,7 @@ public class RawDataStorageDaoImpl implements RawDataStorageDao {
 
     @Override
     public void saveHhVacancy(DownloadableLink link, String json) {
-        String query = "INSERT INTO \"T_HH_RAW_VACANCIES\"(\"URL\", \"DATA\", \"DATE_CREATE\", \"SEQUENCE_NUM\") VALUES (?, ?::JSON, to_timestamp(?), ?)";
+        String query = "INSERT INTO T_HH_RAW_VACANCIES(URL, DATA, DATE_CREATE, SEQUENCE_NUM) VALUES (?, ?::JSON, to_timestamp(?), ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement (query)) {
             preparedStatement.setString(1, link.getUrl());
             preparedStatement.setObject(2, json);

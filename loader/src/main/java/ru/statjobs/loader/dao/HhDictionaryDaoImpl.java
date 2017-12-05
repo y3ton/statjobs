@@ -70,7 +70,12 @@ public class HhDictionaryDaoImpl implements HhDictionaryDao {
         List<Map<String, Object>> list = jsonUtils.readResource(fileName);
         return list.stream()
                 .map(mapGropSpec -> ((List<Map<String, String>>)mapGropSpec.get(groupItemName)).stream()
-                        .map(specMap -> new HhDictionary((String)mapGropSpec.get("name"), specMap.get("name"), specMap.get("id")))
+                        .map(specMap -> new HhDictionary(
+                                (String)mapGropSpec.get("name"),
+                                (String)mapGropSpec.get("id"),
+                                specMap.get("name"),
+                                specMap.get("id"))
+                        )
                         .collect(Collectors.toList())
                 )
                 .flatMap(Collection::stream)

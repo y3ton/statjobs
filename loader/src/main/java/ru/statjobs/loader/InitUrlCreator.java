@@ -3,6 +3,7 @@ package ru.statjobs.loader;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.dto.HhDictionary;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,23 +19,38 @@ public class InitUrlCreator {
             UrlConstructor urlConstructor,
             int sequenceNum
     ) {
-        return cities.values().stream()
-                .map(city ->  specialization.stream()
-                        .map(spec -> experience.values().stream()
-                                .map(exp -> industries.stream()
-                                        .map(ind -> urlConstructor.createHhVacancyUrl(
-                                                spec.getCode(),
-                                                null,
-                                                city,
-                                                exp,
-                                                ind.getCode(),
-                                                0,
-                                                perPage))
-                                        .map(url -> new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_VACANCIES.name()))
-                                )
-                                .flatMap(l -> l))
-                        .flatMap(l -> l))
-                .flatMap(l -> l)
+        List<DownloadableLink> links = new ArrayList<>();
+        List<String> listIndustries = industries.stream()
+                .map(ind -> ind.getGroupCode())
+                .distinct()
                 .collect(Collectors.toList());
+        for (String city: cities.values()) {
+            for (String exp: experience.values()) {
+                for (HhDictionary spec: specialization) {
+                    if (!"Информационные технологии, интернет, телеком".equals(spec.getGroup())) {
+                        continue;
+                    }
+                    List<String> li;
+                    if ("Программирование, Разработка".equals(spec.getItem()) || "Инженер".equals(spec.getItem())) {
+                        li = listIndustries;
+                    } else {
+                        li = new ArrayList<>();
+                        li.add(null);
+                    }
+                    for (String ind: li) {
+                        String url = urlConstructor.createHhVacancyUrl(
+                                spec.getItemCode(),
+                                null,
+                                city,
+                                exp,
+                                ind,
+                                0,
+                                perPage);
+                        links.add(new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_VACANCIES.name()));
+                    }
+                }
+            }
+        }
+        return links;
     }
 }

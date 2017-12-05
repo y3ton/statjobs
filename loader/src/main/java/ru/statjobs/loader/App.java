@@ -45,20 +45,12 @@ public class App {
         downloader = new Downloader();
         urlConstructor = new UrlConstructor();
         jsonUtils = new JsonUtils();
-        //queueDownloadableLinkDao = new QueueDownloadableLinkDaoStub();
         queueDownloadableLinkDao = new QueueDownloadableLinkDaoImpl(connection);
         rawDataStorageDao = new RawDataStorageDaoImpl(connection);
         hhDictionaryDao = new HhDictionaryDaoImpl(jsonUtils);
-        specialization = hhDictionaryDao.getSpecialization().stream()
-                .filter(spec-> "Информационные технологии, интернет, телеком".equals(spec.getItemGroup()))
-                .filter(spec-> "Программирование, Разработка".equals(spec.getItem()))
-                .collect(Collectors.toList());
-        cities = hhDictionaryDao.getCity().entrySet().stream()
-                .filter(map -> map.getKey().equals("Москва"))
-                .collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
-        industries = hhDictionaryDao.getIndustries().stream()
-                .filter(spec-> "Разработка программного обеспечения".equals(spec.getItem()))
-                .collect(Collectors.toList());
+        specialization = hhDictionaryDao.getSpecialization();
+        cities = hhDictionaryDao.getCity();
+        industries = hhDictionaryDao.getIndustries();
         experience = hhDictionaryDao.getExperience();
         initUrlCreator = new InitUrlCreator();
     }

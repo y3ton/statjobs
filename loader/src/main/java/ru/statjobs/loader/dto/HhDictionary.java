@@ -2,25 +2,31 @@ package ru.statjobs.loader.dto;
 
 public class HhDictionary {
 
-    private final String itemGroup;
+    private final String group;
+    private final String groupCode;
     private final String item;
-    private final String code;
+    private final String itemCode;
 
-    public HhDictionary(String itemGroup, String item, String code) {
-        this.itemGroup = itemGroup;
+    public HhDictionary(String group, String groupCode, String item, String code) {
+        this.group = group;
+        this.groupCode = groupCode;
         this.item = item;
-        this.code = code;
+        this.itemCode = code;
     }
 
-    public String getItemGroup() {
-        return itemGroup;
+    public String getGroup() {
+        return group;
+    }
+
+    public String getGroupCode() {
+        return groupCode;
     }
 
     public String getItem() {
         return item;
     }
 
-    public String getCode() {
-        return code;
+    public String getItemCode() {
+        return itemCode;
     }
 }
