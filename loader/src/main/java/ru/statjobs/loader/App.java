@@ -65,7 +65,7 @@ public class App {
             init(connection);
             // create base hh url
             int sequenceNum = (int) Instant.now().getEpochSecond();
-            List<DownloadableLink> firstLink = initUrlCreator.initHhLink(PER_PAGE, cities, specialization, experience, industries, urlConstructor, sequenceNum);
+            List<DownloadableLink> firstLink = initUrlCreator.initHhItLink(urlConstructor, sequenceNum, PER_PAGE, cities, specialization, experience, industries);
             firstLink.forEach(queueDownloadableLinkDao::createDownloadableLink);
             Map<UrlHandler, LinkHandler> locatorHandlers = createUrlHandlerLocator();
             processLink(queueDownloadableLinkDao, locatorHandlers);

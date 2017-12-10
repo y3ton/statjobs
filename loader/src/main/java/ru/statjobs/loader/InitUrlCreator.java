@@ -10,14 +10,14 @@ import java.util.stream.Collectors;
 
 public class InitUrlCreator {
 
-    public List<DownloadableLink> initHhLink(
+    public List<DownloadableLink> initHhItLink(
+            UrlConstructor urlConstructor,
+            int sequenceNum,
             Integer perPage,
             Map<String, String> cities,
             List<HhDictionary> specialization,
             Map<String, String> experience,
-            List<HhDictionary> industries,
-            UrlConstructor urlConstructor,
-            int sequenceNum
+            List<HhDictionary> industries
     ) {
         List<DownloadableLink> links = new ArrayList<>();
         List<String> listIndustries = industries.stream()

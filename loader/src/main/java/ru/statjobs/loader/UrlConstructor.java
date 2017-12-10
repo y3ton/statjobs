@@ -7,8 +7,6 @@ import java.util.List;
 
 public class UrlConstructor {
 
-    // https://hh.ru/search/vacancy?search_period=7&specialization=17.256&area=1&experience=noExperience&page=1
-    //  https://api.hh.ru/vacancies?search_period=7&specialization=17.256&area=1&experience=noExperience&per_page=100&page=1
     public String createHhVacancyUrl(
             String specializationCode,
             Integer searchPeriod,
@@ -34,7 +32,7 @@ public class UrlConstructor {
         if (StringUtils.isNotBlank(industryCode )) {
             param.add("industry=" + industryCode);
         }
-        if (perPage != null) {
+        if (perPage != null && !perPage.equals(0)) {
             param.add("per_page=" + perPage);
         }
         if (page != null && !page.equals(0)) {
@@ -48,7 +46,13 @@ public class UrlConstructor {
         if (arr.length == 1) {
             return arr[0] + "&page=1";
         }
-        return arr[0] + "&page=" + (Integer.valueOf(arr[1]) + 1);
+        String[] arr2 = arr[1].split("&");
+        if (arr2.length == 1) {
+            return arr[0] + "&page=" + (Integer.valueOf(arr2[0]) + 1);
+        } else {
+            return arr[0] + "&page=" + (Integer.valueOf(arr2[0]) + 1) + "&" + arr2[1];
+        }
+
     }
 
 
