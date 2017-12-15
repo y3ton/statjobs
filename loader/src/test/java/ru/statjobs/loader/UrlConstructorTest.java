@@ -50,7 +50,7 @@ public class UrlConstructorTest {
     }
 
     @Test
-    public void createHhVacancyUrlEmptyParmTest() {
+    public void createHhVacancyUrlEmptyParamTest() {
         Assert.assertEquals(
                 "https://api.hh.ru/vacancies?search_period=17&area=area&experience=exp&industry=industry&per_page=27&page=30",
                 urlConstructor.createHhVacancyUrl(

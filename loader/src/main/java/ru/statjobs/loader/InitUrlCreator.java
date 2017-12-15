@@ -21,7 +21,7 @@ public class InitUrlCreator {
     ) {
         List<DownloadableLink> links = new ArrayList<>();
         List<String> listIndustries = industries.stream()
-                .map(ind -> ind.getGroupCode())
+                .map(ind -> ind.getItemCode())
                 .distinct()
                 .collect(Collectors.toList());
         for (String city: cities.values()) {

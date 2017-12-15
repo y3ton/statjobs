@@ -62,7 +62,7 @@ public class InitHhItLinkTest {
         DownloadableLink link = list.get(0);
         Assert.assertEquals((Integer) 0, link.getSequenceNum());
         Assert.assertEquals(UrlHandler.HH_LIST_VACANCIES.name(), link.getHandlerName());
-        Assert.assertEquals("https://api.hh.ru/vacancies?specialization=specCode&area=msk&experience=ex&industry=indGC", link.getUrl());
+        Assert.assertEquals("https://api.hh.ru/vacancies?specialization=specCode&area=msk&experience=ex&industry=indCode", link.getUrl());
     }
 
     @Test
@@ -97,11 +97,13 @@ public class InitHhItLinkTest {
 
         List<DownloadableLink> list =
                 initUrlCreator.initHhItLink (urlConstructor, 0,0, cities, specialization, experience, industries );
-        Assert.assertEquals(3, list.size());
+        Assert.assertEquals(5, list.size());
         List<String> l = list.stream().map(DownloadableLink::getUrl).collect(Collectors.toList());
         Assert.assertTrue(l.contains("https://api.hh.ru/vacancies?specialization=specCode1&area=msk&experience=ex1"));
-        Assert.assertTrue(l.contains("https://api.hh.ru/vacancies?specialization=specCode2&area=msk&experience=ex1&industry=G1"));
+        Assert.assertTrue(l.contains("https://api.hh.ru/vacancies?specialization=specCode2&area=msk&experience=ex1&industry=1"));
         Assert.assertTrue(l.contains("https://api.hh.ru/vacancies?specialization=specCode2&area=msk&experience=ex1&industry=2"));
+        Assert.assertTrue(l.contains("https://api.hh.ru/vacancies?specialization=specCode2&area=msk&experience=ex1&industry=3"));
+        Assert.assertTrue(l.contains("https://api.hh.ru/vacancies?specialization=specCode2&area=msk&experience=ex1&industry=4"));
     }
 
     @Test
@@ -121,12 +123,12 @@ public class InitHhItLinkTest {
         industries.add(new HhDictionary("G2", "2", "i4", "4"));
         List<DownloadableLink> list =
                 initUrlCreator.initHhItLink (urlConstructor, 80,0, cities, specialization, experience, industries);
-        Assert.assertEquals(30, list.size());
+        Assert.assertEquals(54, list.size());
         long n = list.stream()
                 .filter(dLink -> dLink.getHandlerName().equals(UrlHandler.HH_LIST_VACANCIES.name()))
                 .filter(dLink -> dLink.getSequenceNum().equals(80))
                 .count();
-        Assert.assertEquals(30L, n);
+        Assert.assertEquals(54L, n);
     }
 
 }
