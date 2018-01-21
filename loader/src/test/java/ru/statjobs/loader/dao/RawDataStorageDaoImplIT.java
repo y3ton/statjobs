@@ -6,7 +6,6 @@ import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.*;
-import java.time.Instant;
 
 public class RawDataStorageDaoImplIT {
 
@@ -39,7 +38,9 @@ public class RawDataStorageDaoImplIT {
     @Test
     public void getDownloadableLinkTest() throws SQLException {
         String json = "{\"a\":\"b\"}";
+        long startTime = System.currentTimeMillis();
         dao.saveHhVacancy(new DownloadableLink("url1", 1, "HANDLER", null), json);
+        long endTime = System.currentTimeMillis();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from T_HH_RAW_VACANCIES");
         Assert.assertTrue(resultSet.next());
@@ -47,8 +48,7 @@ public class RawDataStorageDaoImplIT {
         Assert.assertEquals(json, resultSet.getString("DATA"));
         Assert.assertEquals(1, resultSet.getInt("SEQUENCE_NUM"));
         Timestamp timestamp = resultSet.getTimestamp("DATE_CREATE");
-        long time = Instant.now().getEpochSecond();
-        Assert.assertTrue(time - 1000 < timestamp.getTime() && timestamp.getTime() <= time);
+        Assert.assertTrue(startTime <= timestamp.getTime() && timestamp.getTime() <= endTime);
         resultSet.close();
         statement.close();
     }

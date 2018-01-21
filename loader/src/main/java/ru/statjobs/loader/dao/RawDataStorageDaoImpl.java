@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
 
 public class RawDataStorageDaoImpl implements RawDataStorageDao {
 
@@ -32,7 +31,7 @@ public class RawDataStorageDaoImpl implements RawDataStorageDao {
         try (PreparedStatement preparedStatement = connection.prepareStatement (query)) {
             preparedStatement.setString(1, link.getUrl());
             preparedStatement.setObject(2, json);
-            preparedStatement.setTimestamp(3, new Timestamp(Instant.now().getEpochSecond()));
+            preparedStatement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
             preparedStatement.setInt(4, link.getSequenceNum());
             preparedStatement.executeUpdate();
         }
