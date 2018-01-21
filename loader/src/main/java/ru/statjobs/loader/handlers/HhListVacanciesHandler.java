@@ -49,13 +49,14 @@ public class HhListVacanciesHandler implements  LinkHandler {
             items.stream()
                     .map(item -> (String) item.get("url"))
                     .filter(StringUtils::isNotBlank)
-                    .map(urlVacancy -> new DownloadableLink(urlVacancy, link.getSequenceNum(), UrlHandler.HH_VACANCY.name()))
+                    .map(urlVacancy -> new DownloadableLink(urlVacancy, link.getSequenceNum(), UrlHandler.HH_VACANCY.name(), null))
                     .forEach(queueDownloadableLinkDao::createDownloadableLink);
 
             DownloadableLink nextLink = new DownloadableLink(
                     urlConstructor.hhVacancyUrlNextPage(link.getUrl()),
                     link.getSequenceNum(),
-                    UrlHandler.HH_LIST_VACANCIES.name()
+                    UrlHandler.HH_LIST_VACANCIES.name(),
+                    null
             );
             queueDownloadableLinkDao.createDownloadableLink(nextLink);
         }

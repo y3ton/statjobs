@@ -46,7 +46,7 @@ public class InitUrlCreator {
                                 ind,
                                 0,
                                 perPage);
-                        links.add(new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_VACANCIES.name()));
+                        links.add(new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_VACANCIES.name(), null));
                     }
                 }
             }

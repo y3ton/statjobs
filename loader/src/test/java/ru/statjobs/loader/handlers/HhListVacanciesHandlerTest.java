@@ -33,11 +33,11 @@ public class HhListVacanciesHandlerTest {
     @BeforeClass
     public static void start() throws SQLException {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
+        jsonUtils = new JsonUtils();
         H2Utils.runScript("sql/queue.sql", connection);
-        dao = new QueueDownloadableLinkDaoImpl(connection);
+        dao = new QueueDownloadableLinkDaoImpl(connection, jsonUtils, false);
         downloader = new Downloader();
         urlConstructor = new UrlConstructor();
-        jsonUtils = new JsonUtils();
         wireMockServer.start();
     }
 
@@ -60,7 +60,7 @@ public class HhListVacanciesHandlerTest {
     public void hhListVacanciesHandlerComplexTest() {
         HhListVacanciesHandler handler = new HhListVacanciesHandler(downloader, jsonUtils, dao, urlConstructor);
 
-        DownloadableLink link = new DownloadableLink("http://localhost:8080/json1", 1, UrlHandler.HH_LIST_VACANCIES.name());
+        DownloadableLink link = new DownloadableLink("http://localhost:8080/json1", 1, UrlHandler.HH_LIST_VACANCIES.name(), null);
         dao.createDownloadableLink(link);
         Assert.assertNotNull(dao.getDownloadableLink());
 
@@ -85,7 +85,7 @@ public class HhListVacanciesHandlerTest {
     public void hhListVacanciesHandlerDownloadEmptyResultTest() {
         HhListVacanciesHandler handler = new HhListVacanciesHandler(downloader, jsonUtils, dao, urlConstructor);
 
-        DownloadableLink link = new DownloadableLink("http://localhost:8080/json1", 1, UrlHandler.HH_LIST_VACANCIES.name());
+        DownloadableLink link = new DownloadableLink("http://localhost:8080/json1", 1, UrlHandler.HH_LIST_VACANCIES.name(), null);
         dao.createDownloadableLink(link);
         Assert.assertNotNull(dao.getDownloadableLink());
 

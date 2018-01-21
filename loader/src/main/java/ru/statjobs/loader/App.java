@@ -8,6 +8,7 @@ import ru.statjobs.loader.handlers.HhListVacanciesHandler;
 import ru.statjobs.loader.handlers.HhVacancyHandler;
 import ru.statjobs.loader.handlers.LinkHandler;
 import ru.statjobs.loader.utils.Downloader;
+import ru.statjobs.loader.utils.FileUtils;
 import ru.statjobs.loader.utils.JsonUtils;
 
 import java.io.IOException;
@@ -36,6 +37,7 @@ public class App {
     private Map<String, String> cities;
     private Map<String, String> experience;
     private InitUrlCreator initUrlCreator;
+    private FileUtils fileUtils;
 
     public static void main(String[] args) throws IOException, SQLException {
         new App().process();
@@ -45,9 +47,10 @@ public class App {
         downloader = new Downloader();
         urlConstructor = new UrlConstructor();
         jsonUtils = new JsonUtils();
+        fileUtils = new FileUtils();
         queueDownloadableLinkDao = new QueueDownloadableLinkDaoImpl(connection);
         rawDataStorageDao = new RawDataStorageDaoImpl(connection);
-        hhDictionaryDao = new HhDictionaryDaoImpl(jsonUtils);
+        hhDictionaryDao = new HhDictionaryDaoImpl(jsonUtils, fileUtils);
         specialization = hhDictionaryDao.getSpecialization();
         cities = hhDictionaryDao.getCity();
         industries = hhDictionaryDao.getIndustries();

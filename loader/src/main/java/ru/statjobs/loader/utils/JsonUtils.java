@@ -1,47 +1,40 @@
 package ru.statjobs.loader.utils;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Map;
 
 public class JsonUtils {
 
     // Mapper are fully thread-safe
     private final static ObjectMapper mapper = new ObjectMapper();
 
+    public String createString(Map map) {
+        if (map == null) {
+            return null;
+        }
+        try {
+            return mapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public <T> T readString(String json) {
+        if (StringUtils.isBlank(json)) {
+            return (T) Collections.EMPTY_MAP;
+        }
         try {
             return mapper.readValue(json, new TypeReference<T>(){});
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
-    public <T> T readResource(String name) {
-        String json = readFile(getResourceFile(name));
-        return readString(json);
-    }
-
-    private String getResourceFile(String name) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        return (new File(classLoader.getResource(name).getFile())).getAbsolutePath();
-    }
-
-    private String readFile(String path) {
-        try {
-            return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-
 
 }

@@ -3,6 +3,7 @@ package ru.statjobs.loader.utils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,25 @@ public class JsonUtilsTest {
         Assert.assertEquals((Integer) 1, r.get("a").get(0).get("b"));
         Assert.assertEquals((Integer) 4, r.get("a").get(1).get("c"));
         Assert.assertEquals((Integer) 1, r.get("d").get(0).get("e"));
+    }
+
+    @Test
+    public void readEmptyStringTest() {
+        Map map = jsonUtils.readString(null);
+        Assert.assertTrue(map.isEmpty());
+        map = jsonUtils.readString("");
+        Assert.assertTrue(map.isEmpty());
+        map = jsonUtils.readString(" ");
+        Assert.assertTrue(map.isEmpty());
+    }
+
+    @Test
+    public void createStringTest() {
+        Assert.assertEquals(null, jsonUtils.createString(null));
+        Map<String, String> map = new HashMap<>();
+        Assert.assertEquals("{}", jsonUtils.createString(map));
+        map.put("a", "b");
+        Assert.assertEquals("{\"a\":\"b\"}", jsonUtils.createString(map));
     }
 
 }

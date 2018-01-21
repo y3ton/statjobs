@@ -17,7 +17,9 @@ public class H2Utils {
                     (new File((new H2Utils()).getClass().getClassLoader().getResource(resourceName).getFile()))
                     .getAbsolutePath();
             String query = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
-            query = query.replace("timestamp without time zone", "timestamp");
+            query = query
+                    .replace("timestamp without time zone", "timestamp")
+                    .replace("jsonb", "character varying(1024)");
             RunScript.execute(connection, new StringReader(query));
         } catch (Exception ex) {
             throw new RuntimeException(ex);

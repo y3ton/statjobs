@@ -12,6 +12,7 @@ import ru.statjobs.loader.dao.RawDataStorageDao;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.utils.Downloader;
+import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,7 +33,8 @@ public class HhVacancyHandlerIT {
     public static void start() throws SQLException {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
         H2Utils.runScript("sql/queue.sql", connection);
-        dao = new QueueDownloadableLinkDaoImpl(connection);
+        dao = new QueueDownloadableLinkDaoImpl(connection, new JsonUtils(), false);
+
         downloader = new Downloader();
         rawDataStorageDao = Mockito.mock(RawDataStorageDao.class);
         wireMockServer.start();
@@ -47,7 +49,7 @@ public class HhVacancyHandlerIT {
     @Test
     public void hhVacancyHandlerComplexTest() {
         HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
-        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 1, UrlHandler.HH_VACANCY.name());
+        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 1, UrlHandler.HH_VACANCY.name(), null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
 

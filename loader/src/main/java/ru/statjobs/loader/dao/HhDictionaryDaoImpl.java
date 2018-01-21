@@ -2,6 +2,7 @@ package ru.statjobs.loader.dao;
 
 
 import ru.statjobs.loader.dto.HhDictionary;
+import ru.statjobs.loader.utils.FileUtils;
 import ru.statjobs.loader.utils.JsonUtils;
 
 import java.util.*;
@@ -32,12 +33,14 @@ public class HhDictionaryDaoImpl implements HhDictionaryDao {
             .collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
 
     private final JsonUtils jsonUtils;
+    private final FileUtils fileUtils;
 
     private List<HhDictionary> specializations;
     private List<HhDictionary> industries;
 
-    public HhDictionaryDaoImpl(JsonUtils jsonUtils) {
+    public HhDictionaryDaoImpl(JsonUtils jsonUtils, FileUtils fileUtils) {
         this.jsonUtils = jsonUtils;
+        this.fileUtils = fileUtils;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class HhDictionaryDaoImpl implements HhDictionaryDao {
     }
 
     private List<HhDictionary> loadDictionary(String fileName, String groupItemName) {
-        List<Map<String, Object>> list = jsonUtils.readResource(fileName);
+        List<Map<String, Object>> list = jsonUtils.readString(fileUtils.readResourceFile(fileName));
         return list.stream()
                 .map(mapGroupSpec -> ((List<Map<String, String>>)mapGroupSpec.get(groupItemName)).stream()
                         .map(specMap -> new HhDictionary(

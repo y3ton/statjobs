@@ -1,15 +1,19 @@
 package ru.statjobs.loader.dto;
 
+import java.util.Map;
+
 public class DownloadableLink {
 
     private final String url;
     private final Integer sequenceNum;
     private final String handlerName;
+    private final Map<String, String> props;
 
-    public DownloadableLink(String url, Integer sequenceNum, String handlerName) {
+    public DownloadableLink(String url, Integer sequenceNum, String handlerName, Map<String, String> props) {
         this.url = url;
         this.sequenceNum = sequenceNum;
         this.handlerName = handlerName;
+        this.props = props;
     }
 
     public String getUrl() {
@@ -22,5 +26,9 @@ public class DownloadableLink {
 
     public Integer getSequenceNum() {
         return sequenceNum;
+    }
+
+    public Map<String, String> getProps() {
+        return props;
     }
 }

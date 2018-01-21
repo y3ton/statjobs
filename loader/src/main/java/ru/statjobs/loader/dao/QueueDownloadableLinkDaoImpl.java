@@ -3,17 +3,27 @@ package ru.statjobs.loader.dao;
 
 import org.javatuples.Pair;
 import ru.statjobs.loader.dto.DownloadableLink;
+import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.*;
+import java.util.Map;
 
 public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
 
     public final static int MAX_ATTEMPT_GET_LINK = 10;
 
     private final Connection connection;
+    private final JsonUtils jsonUtils;
+    private final boolean postgresMode;
 
     public QueueDownloadableLinkDaoImpl(Connection connection) {
+        this(connection, null, true);
+    }
+
+    public QueueDownloadableLinkDaoImpl(Connection connection, JsonUtils jsonUtils, boolean postgresMode) {
         this.connection = connection;
+        this.jsonUtils = jsonUtils;
+        this.postgresMode = postgresMode;
     }
 
     @Override
@@ -22,13 +32,21 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
             return false;
         }
         String query =
-                "insert into T_QUEUE_DOWNLOADABLE_LINK(HANDLER_NAME, URL, DATE_CREATE, SEQUENCE_NUM, IS_DELETE) " +
-                "values (?, ?, ?, ?, FALSE)";
+                "insert into T_QUEUE_DOWNLOADABLE_LINK(HANDLER_NAME, URL, DATE_CREATE, SEQUENCE_NUM, IS_DELETE, PROPS) " +
+                "values (?, ?, ?, ?, FALSE, ?::JSON)";
+        if (!postgresMode) {
+            query = query.replace("?::JSON", "?");
+        }
         try (PreparedStatement preparedStatement = connection.prepareStatement (query)) {
             preparedStatement.setString(1, link.getHandlerName());
             preparedStatement.setString(2, link.getUrl());
             preparedStatement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
             preparedStatement.setInt(4, link.getSequenceNum());
+            if (postgresMode) {
+                preparedStatement.setObject(5, link.getProps());
+            } else {
+                preparedStatement.setString(5, jsonUtils.createString(link.getProps()));
+            }
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -96,7 +114,7 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
     }
 
     private Pair<Integer, DownloadableLink> selectRandomDownloadableLink() {
-        String query = "select ID, HANDLER_NAME, URL, SEQUENCE_NUM " +
+        String query = "select ID, HANDLER_NAME, URL, SEQUENCE_NUM, PROPS " +
                 "from T_QUEUE_DOWNLOADABLE_LINK " +
                 "where DATE_PROCESS is null and IS_DELETE <> true " +
                 "order by random() limit 1";
@@ -111,7 +129,10 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
             DownloadableLink downloadableLink = new DownloadableLink(
                     resultSet.getString("URL"),
                     resultSet.getInt("SEQUENCE_NUM"),
-                    resultSet.getString("HANDLER_NAME")
+                    resultSet.getString("HANDLER_NAME"),
+                    postgresMode
+                            ? (Map<String, String>) resultSet.getObject("PROPS")
+                            : jsonUtils.readString(resultSet.getString("PROPS"))
             );
             return new Pair<>(id, downloadableLink);
         } catch (SQLException e) {

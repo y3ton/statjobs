@@ -6,5 +6,6 @@ CREATE TABLE T_QUEUE_DOWNLOADABLE_LINK
     DATE_CREATE timestamp without time zone NOT NULL,
     DATE_PROCESS timestamp without time zone,
     SEQUENCE_NUM integer NOT NULL,
-    IS_DELETE boolean NOT NULL
+    IS_DELETE boolean NOT NULL,
+    PROPS jsonb
 )
