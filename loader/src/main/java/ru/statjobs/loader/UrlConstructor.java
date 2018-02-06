@@ -55,5 +55,32 @@ public class UrlConstructor {
 
     }
 
+    public String createHhResumeListUrl(
+            String specializationCode,
+            Integer searchPeriod,
+            String areaCode,
+            Integer page,
+            Integer perPage) {
+        String url = "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true";
+        List<String> param = new ArrayList<>();
+        if (StringUtils.isNotBlank(specializationCode )) {
+            param.add("specialization=" + specializationCode);
+        }
+        if (searchPeriod != null && !searchPeriod.equals(0)) {
+            param.add("search_period=" + searchPeriod);
+        }
+        if (StringUtils.isNotBlank(areaCode )) {
+            param.add("area=" + areaCode);
+        }
+        if (perPage != null && !perPage.equals(0)) {
+            param.add("items_on_page=" + perPage);
+        }
+        if (page != null && !page.equals(0)) {
+            param.add("page=" + page);
+        }
+        param.add(0, url);
+        return StringUtils.join(param, "&");
+    }
+
 
 }

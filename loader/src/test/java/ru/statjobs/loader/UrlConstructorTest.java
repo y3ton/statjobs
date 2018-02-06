@@ -93,4 +93,29 @@ public class UrlConstructorTest {
                         null,0,0));
     }
 
+    @Test
+    public void createHhResumeListUrlTest() {
+        Assert.assertEquals(
+                "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true&specialization=1.327&search_period=30&area=1&items_on_page=100&page=7",
+                urlConstructor.createHhResumeListUrl("1.327",30,"1",7,100));
+        Assert.assertEquals(
+                "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true&search_period=30&area=1&items_on_page=100&page=7",
+                urlConstructor.createHhResumeListUrl("",30,"1",7,100));
+        Assert.assertEquals(
+                "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true&area=1&items_on_page=100&page=7",
+                urlConstructor.createHhResumeListUrl("",0,"1",7,100));
+        Assert.assertEquals(
+                "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true&items_on_page=100&page=7",
+                urlConstructor.createHhResumeListUrl("",0,"",7,100));
+        Assert.assertEquals(
+                "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true&page=7",
+                urlConstructor.createHhResumeListUrl("",0,"",7,0));
+        Assert.assertEquals(
+                "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true",
+                urlConstructor.createHhResumeListUrl("",0,"",0,0));
+        Assert.assertEquals(
+                "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true",
+                urlConstructor.createHhResumeListUrl(null,null,null,null,null));
+    }
+
 }

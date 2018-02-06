@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -67,8 +66,8 @@ public class App {
         {
             init(connection);
             // create base hh url
-            int sequenceNum = (int) Instant.now().getEpochSecond();
-            //List<DownloadableLink> firstLink = initUrlCreator.initHhItLink(urlConstructor, sequenceNum, PER_PAGE, cities, specialization, experience, industries);
+            //int sequenceNum = (int) Instant.now().getEpochSecond();
+            //List<DownloadableLink> firstLink = initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, PER_PAGE, cities, specialization, experience, industries);
             //firstLink.forEach(queueDownloadableLinkDao::createDownloadableLink);
             Map<UrlHandler, LinkHandler> locatorHandlers = createUrlHandlerLocator();
             processLink(queueDownloadableLinkDao, locatorHandlers);

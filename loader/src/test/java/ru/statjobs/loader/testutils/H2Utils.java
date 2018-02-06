@@ -14,7 +14,7 @@ public class H2Utils {
     public static void runScript(String resourceName, Connection connection)  {
         try {
             String path =
-                    (new File((new H2Utils()).getClass().getClassLoader().getResource(resourceName).getFile()))
+                    (new File(H2Utils.class.getClassLoader().getResource(resourceName).getFile()))
                     .getAbsolutePath();
             String query = new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
             query = query

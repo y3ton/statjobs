@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-public class InitHhItLinkTest {
+public class InitHhItVacancyLinkTest {
 
     public static final String IT_GROUP_NAME = "Информационные технологии, интернет, телеком";
     public static final String IT_IND_PROGRAMMER =  "Программирование, Разработка";
@@ -42,7 +42,7 @@ public class InitHhItLinkTest {
         experience.put("ex", "ex");
         //industries.add(new HhDictionary("indG", "indGC", "ind", "indCode"));
         List<DownloadableLink> list =
-            initUrlCreator.initHhItLink (urlConstructor, 170,0, cities, specialization, experience, industries );
+            initUrlCreator.initHhItVacancyLink(urlConstructor, 170,0, cities, specialization, experience, industries );
         Assert.assertEquals(1, list.size());
         DownloadableLink link = list.get(0);
         Assert.assertEquals((Integer) 170, link.getSequenceNum());
@@ -57,7 +57,7 @@ public class InitHhItLinkTest {
         experience.put("ex", "ex");
         industries.add(new HhDictionary("indG", "indGC", "ind", "indCode"));
         List<DownloadableLink> list =
-                initUrlCreator.initHhItLink (urlConstructor, 0,0, cities, specialization, experience, industries );
+                initUrlCreator.initHhItVacancyLink(urlConstructor, 0,0, cities, specialization, experience, industries );
         Assert.assertEquals(1, list.size());
         DownloadableLink link = list.get(0);
         Assert.assertEquals((Integer) 0, link.getSequenceNum());
@@ -73,7 +73,7 @@ public class InitHhItLinkTest {
         experience.put("ex1", "ex1");
         experience.put("ex2", "ex2");
         List<DownloadableLink> list =
-                initUrlCreator.initHhItLink (urlConstructor, 0,0, cities, specialization, experience, industries );
+                initUrlCreator.initHhItVacancyLink(urlConstructor, 0,0, cities, specialization, experience, industries );
         Assert.assertEquals(4, list.size());
 
         List<String> l = list.stream().map(DownloadableLink::getUrl).collect(Collectors.toList());
@@ -96,7 +96,7 @@ public class InitHhItLinkTest {
         industries.add(new HhDictionary("G2", "2", "i4", "4"));
 
         List<DownloadableLink> list =
-                initUrlCreator.initHhItLink (urlConstructor, 0,0, cities, specialization, experience, industries );
+                initUrlCreator.initHhItVacancyLink(urlConstructor, 0,0, cities, specialization, experience, industries );
         Assert.assertEquals(5, list.size());
         List<String> l = list.stream().map(DownloadableLink::getUrl).collect(Collectors.toList());
         Assert.assertTrue(l.contains("https://api.hh.ru/vacancies?specialization=specCode1&area=msk&experience=ex1"));
@@ -122,7 +122,7 @@ public class InitHhItLinkTest {
         industries.add(new HhDictionary("G2", "2", "i3", "3"));
         industries.add(new HhDictionary("G2", "2", "i4", "4"));
         List<DownloadableLink> list =
-                initUrlCreator.initHhItLink (urlConstructor, 80,0, cities, specialization, experience, industries);
+                initUrlCreator.initHhItVacancyLink(urlConstructor, 80,0, cities, specialization, experience, industries);
         Assert.assertEquals(54, list.size());
         long n = list.stream()
                 .filter(dLink -> dLink.getHandlerName().equals(UrlHandler.HH_LIST_VACANCIES.name()))

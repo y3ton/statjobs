@@ -3,7 +3,6 @@ package ru.statjobs.loader.dao;
 import org.junit.*;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.testutils.H2Utils;
-import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.*;
 
@@ -11,8 +10,6 @@ public class RawDataStorageDaoImplIT {
 
     private static Connection connection;
     private static RawDataStorageDaoImpl dao;
-
-    JsonUtils jsonUtils = new JsonUtils();
 
     @BeforeClass
     public static void start() throws SQLException {

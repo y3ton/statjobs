@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class InitUrlCreator {
 
-    public List<DownloadableLink> initHhItLink(
+    public List<DownloadableLink> initHhItVacancyLink(
             UrlConstructor urlConstructor,
             int sequenceNum,
             Integer perPage,
@@ -53,4 +53,28 @@ public class InitUrlCreator {
         }
         return links;
     }
+
+    public List<DownloadableLink> initHhItResumeLink(
+            UrlConstructor urlConstructor,
+            int sequenceNum,
+            Integer perPage,
+            Map<String, String> cities,
+            List<HhDictionary> specialization,
+            Integer searchPeriod
+    ) {
+        List<DownloadableLink> links = new ArrayList<>();
+        for (String city: cities.values()) {
+            for (HhDictionary spec: specialization) {
+                String url = urlConstructor.createHhResumeListUrl(
+                        spec.getItemCode(),
+                        searchPeriod,
+                        city,
+                        0,
+                        perPage);
+                links.add(new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_RESUME.name(), null));
+            }
+        }
+        return links;
+    }
+
 }
