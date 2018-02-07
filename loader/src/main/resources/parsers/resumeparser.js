@@ -1,12 +1,3 @@
-findObj = (selector, element) => {
-	return element ? Array.prototype.slice.call(element.querySelectorAll(selector)) : [];
-}
-
-findText = (selector, element) => {
-	var e = element ? Array.prototype.slice.call(element.querySelectorAll(selector))[0] : "";
-	return e ? e.innerText : "";
-}
-
 findTextContains = (selector, element, text) => {
 	if (element) {
 		var e = Array.prototype.slice.call(element.querySelectorAll(selector)).map(e => e.innerText).filter(s => s.indexOf(text) == 0)[0];
@@ -16,12 +7,14 @@ findTextContains = (selector, element, text) => {
 	}
 }
 
-findResumes = () => findObj('[data-qa="resume-serp__resume"]', document).map(element => {return {
-	url: findObj('[data-qa="resume-serp__resume-title"]', element)[0].href,
-	update: findText('[class="output__tab m-output__date"]', element)
+findObj = (selector, element) => {
+	return element ? Array.prototype.slice.call(element.querySelectorAll(selector)) : [];
+}
 
-}})
-
+findText = (selector, element) => {
+	var e = element ? Array.prototype.slice.call(element.querySelectorAll(selector))[0] : "";
+	return e ? e.innerText : "";
+}
 
 verify = (obj) => {
 	var text = findText('[class="resume-wrapper"]', document);
@@ -34,7 +27,8 @@ verify = (obj) => {
 	.filter(item => allow.indexOf(item) < 0)
 }
 
-parseResume = () => { return {
+parseResume = () => {
+    var o = {
 	gender: 			findText('[data-qa="resume-personal-gender"]', document),
 	age: 				findText('[data-qa="resume-personal-age"]', document),
 	birthday: 			findObj('[data-qa="resume-personal-birthday"]', document)[0] ? findObj('[data-qa="resume-personal-birthday"]', document)[0].getAttribute("content") : "",
@@ -91,4 +85,9 @@ parseResume = () => { return {
 				organization: findText('[data-qa="resume-block-education-organization"]', item)
 			}
 		}).filter(item => item.name)
-}}
+    }
+    if (verify(o).length > 0) {
+        return null;
+    }
+    return JSON.stringify(o);
+}
