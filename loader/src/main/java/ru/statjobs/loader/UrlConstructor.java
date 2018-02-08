@@ -41,7 +41,7 @@ public class UrlConstructor {
         return url + (param.size() == 0 ? "": "?" + StringUtils.join(param, "&"));
     }
 
-    public String hhVacancyUrlNextPage(String url) {
+    public String hhUrlNextPage(String url) {
         String[] arr = url.split("&page=");
         if (arr.length == 1) {
             return arr[0] + "&page=1";

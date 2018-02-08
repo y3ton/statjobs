@@ -6,7 +6,6 @@ import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.*;
-import java.util.Map;
 
 public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
 
@@ -16,8 +15,8 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
     private final JsonUtils jsonUtils;
     private final boolean postgresMode;
 
-    public QueueDownloadableLinkDaoImpl(Connection connection) {
-        this(connection, null, true);
+    public QueueDownloadableLinkDaoImpl(Connection connection, JsonUtils jsonUtils) {
+        this(connection, jsonUtils, true);
     }
 
     public QueueDownloadableLinkDaoImpl(Connection connection, JsonUtils jsonUtils, boolean postgresMode) {
@@ -42,11 +41,7 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
             preparedStatement.setString(2, link.getUrl());
             preparedStatement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
             preparedStatement.setInt(4, link.getSequenceNum());
-            if (postgresMode) {
-                preparedStatement.setObject(5, link.getProps());
-            } else {
-                preparedStatement.setString(5, jsonUtils.createString(link.getProps()));
-            }
+            preparedStatement.setString(5, jsonUtils.createString(link.getProps()));
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -130,9 +125,7 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
                     resultSet.getString("URL"),
                     resultSet.getInt("SEQUENCE_NUM"),
                     resultSet.getString("HANDLER_NAME"),
-                    postgresMode
-                            ? (Map<String, String>) resultSet.getObject("PROPS")
-                            : jsonUtils.readString(resultSet.getString("PROPS"))
+                    jsonUtils.readString(resultSet.getString("PROPS"))
             );
             return new Pair<>(id, downloadableLink);
         } catch (SQLException e) {

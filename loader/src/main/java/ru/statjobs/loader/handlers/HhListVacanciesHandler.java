@@ -53,7 +53,7 @@ public class HhListVacanciesHandler implements  LinkHandler {
                     .forEach(queueDownloadableLinkDao::createDownloadableLink);
 
             DownloadableLink nextLink = new DownloadableLink(
-                    urlConstructor.hhVacancyUrlNextPage(link.getUrl()),
+                    urlConstructor.hhUrlNextPage(link.getUrl()),
                     link.getSequenceNum(),
                     UrlHandler.HH_LIST_VACANCIES.name(),
                     null

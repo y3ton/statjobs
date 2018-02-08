@@ -24,7 +24,16 @@ public class RawDataStorageDaoImpl implements RawDataStorageDao {
 
     @Override
     public void saveHhVacancy(DownloadableLink link, String json) {
-        String query = "INSERT INTO T_HH_RAW_VACANCIES(URL, DATA, DATE_CREATE, SEQUENCE_NUM) VALUES (?, ?::JSON, ?, ?)";
+        saveHhData(link, json, "T_HH_RAW_VACANCIES");
+    }
+
+    @Override
+    public void saveHhResume(DownloadableLink link, String json) {
+        saveHhData(link, json, "T_HH_RAW_RESUMES");
+    }
+
+    void saveHhData(DownloadableLink link, String json, String tableName) {
+        String query = "INSERT INTO " + tableName + "(URL, DATA, DATE_CREATE, SEQUENCE_NUM) VALUES (?, ?::JSON, ?, ?)";
         if (!postgresMode) {
             query = query.replace("?::JSON", "?");
         }
@@ -35,8 +44,9 @@ public class RawDataStorageDaoImpl implements RawDataStorageDao {
             preparedStatement.setInt(4, link.getSequenceNum());
             preparedStatement.executeUpdate();
         }
-         catch (SQLException e) {
+        catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
 }

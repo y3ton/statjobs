@@ -14,29 +14,41 @@ public class UrlConstructorTest {
                 "&specialization=spec&area=area&experience=exp&industry=industry&per_page=27&page=30";
         String ur12 = "https://api.hh.ru/vacancies?search_period=17" +
                 "&specialization=spec&area=area&experience=exp&industry=industry&per_page=27&page=31";
-        Assert.assertEquals(ur12, urlConstructor.hhVacancyUrlNextPage(ur11));
+        Assert.assertEquals(ur12, urlConstructor.hhUrlNextPage(ur11));
 
         ur11 = "https://api.hh.ru/vacancies?search_period=17" +
                 "&specialization=spec&area=area&experience=exp&industry=industry&per_page=27&page=1";
         ur12 = "https://api.hh.ru/vacancies?search_period=17" +
                 "&specialization=spec&area=area&experience=exp&industry=industry&per_page=27&page=2";
-        Assert.assertEquals(ur12, urlConstructor.hhVacancyUrlNextPage(ur11));
+        Assert.assertEquals(ur12, urlConstructor.hhUrlNextPage(ur11));
 
         ur11 = "https://api.hh.ru/vacancies?search_period=17" +
                 "&specialization=spec&area=area&experience=exp&industry=industry&per_page=27";
         ur12 = "https://api.hh.ru/vacancies?search_period=17" +
                 "&specialization=spec&area=area&experience=exp&industry=industry&per_page=27&page=1";
-        Assert.assertEquals(ur12, urlConstructor.hhVacancyUrlNextPage(ur11));
+        Assert.assertEquals(ur12, urlConstructor.hhUrlNextPage(ur11));
+
+        ur11 = "https://hh.ru/search/resume?exp_period=all_time&items_on_page=100&order_by=publication_time&specialization=1.327&area=1&text=&pos=full_text&logic=normal&clusters=true&search_period=30&page=36";
+        ur12 = "https://hh.ru/search/resume?exp_period=all_time&items_on_page=100&order_by=publication_time&specialization=1.327&area=1&text=&pos=full_text&logic=normal&clusters=true&search_period=30&page=37";
+        Assert.assertEquals(ur12, urlConstructor.hhUrlNextPage(ur11));
     }
 
     @Test
+    public void hhResumeUrlNextPageTest() {
+        String ur11 = "https://hh.ru/search/resume?exp_period=all_time&items_on_page=100&order_by=publication_time&specialization=1.327&area=1&text=&pos=full_text&logic=normal&clusters=true&search_period=30&page=36";
+        String ur12 = "https://hh.ru/search/resume?exp_period=all_time&items_on_page=100&order_by=publication_time&specialization=1.327&area=1&text=&pos=full_text&logic=normal&clusters=true&search_period=30&page=37";
+        Assert.assertEquals(ur12, urlConstructor.hhUrlNextPage(ur11));
+    }
+
+
+    @Test
     public void hhVacancyUrlNextPageTest2() {
-        Assert.assertEquals("url&page=1", urlConstructor.hhVacancyUrlNextPage("url"));
-        Assert.assertEquals("url&page=2", urlConstructor.hhVacancyUrlNextPage(urlConstructor.hhVacancyUrlNextPage("url")));
-        Assert.assertEquals("url&page=213&param", urlConstructor.hhVacancyUrlNextPage("url&page=212&param"));
-        Assert.assertEquals("url&page=1&param", urlConstructor.hhVacancyUrlNextPage("url&page=0&param"));
-        Assert.assertEquals("&page=1", urlConstructor.hhVacancyUrlNextPage(""));
-        Assert.assertEquals("1&2&url&3&4&page=1", urlConstructor.hhVacancyUrlNextPage("1&2&url&3&4"));
+        Assert.assertEquals("url&page=1", urlConstructor.hhUrlNextPage("url"));
+        Assert.assertEquals("url&page=2", urlConstructor.hhUrlNextPage(urlConstructor.hhUrlNextPage("url")));
+        Assert.assertEquals("url&page=213&param", urlConstructor.hhUrlNextPage("url&page=212&param"));
+        Assert.assertEquals("url&page=1&param", urlConstructor.hhUrlNextPage("url&page=0&param"));
+        Assert.assertEquals("&page=1", urlConstructor.hhUrlNextPage(""));
+        Assert.assertEquals("1&2&url&3&4&page=1", urlConstructor.hhUrlNextPage("1&2&url&3&4"));
     }
 
     @Test
