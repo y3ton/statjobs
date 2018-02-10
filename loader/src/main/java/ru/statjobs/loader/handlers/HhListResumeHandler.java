@@ -1,9 +1,6 @@
 package ru.statjobs.loader.handlers;
 
-import ru.statjobs.loader.JsScript;
-import ru.statjobs.loader.SeleniumBrowser;
-import ru.statjobs.loader.UrlConstructor;
-import ru.statjobs.loader.UrlHandler;
+import ru.statjobs.loader.*;
 import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
 import ru.statjobs.loader.dto.DownloadableLink;
 
@@ -16,7 +13,7 @@ import java.util.*;
 public class HhListResumeHandler implements  LinkHandler  {
 
     public final DateFormat jsFormat = new SimpleDateFormat("Обновлено dd MMMM, HH:mm", new Locale("ru"));
-    public final DateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", new Locale("ru"));
+    public final DateFormat outputFormat = new SimpleDateFormat(Const.DATE_FORMAT, new Locale("ru"));
 
     private final SeleniumBrowser seleniumBrowser;
     private final JsScript jsScript;
@@ -42,7 +39,7 @@ public class HhListResumeHandler implements  LinkHandler  {
         list.stream()
                 .map(list2 -> {
                     Map<String, String> props = new HashMap();
-                    props.put("dateCreate", formatDate(list2.get(1)));
+                    props.put(Const.DATE_CREATE_RESUME, formatDate(list2.get(1)));
                     return new DownloadableLink(
                             list2.get(0),
                             link.getSequenceNum(),

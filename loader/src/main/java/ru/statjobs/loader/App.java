@@ -4,9 +4,7 @@ package ru.statjobs.loader;
 import ru.statjobs.loader.dao.*;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.dto.HhDictionary;
-import ru.statjobs.loader.handlers.HhListVacanciesHandler;
-import ru.statjobs.loader.handlers.HhVacancyHandler;
-import ru.statjobs.loader.handlers.LinkHandler;
+import ru.statjobs.loader.handlers.*;
 import ru.statjobs.loader.utils.Downloader;
 import ru.statjobs.loader.utils.FileUtils;
 import ru.statjobs.loader.utils.JsonUtils;
@@ -16,14 +14,14 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class App {
 
-    public static final Integer PER_PAGE = 100;
-    public static final String PROPERTIES_FILE = "app.properties";
+
 
     private Downloader downloader;
     private UrlConstructor urlConstructor;
@@ -37,17 +35,22 @@ public class App {
     private Map<String, String> experience;
     private InitUrlCreator initUrlCreator;
     private FileUtils fileUtils;
+    private SeleniumBrowser seleniumBrowser;
+    private JsScript jsScript;
 
     public static void main(String[] args) throws IOException, SQLException {
-        new App().process();
+        App app = new App();
+        Properties props = app.loadProperties();
+        app.process(props);
     }
 
-    private void init(Connection connection) {
+    private void init(Properties properties, Connection connection) {
+
         downloader = new Downloader();
         urlConstructor = new UrlConstructor();
         jsonUtils = new JsonUtils();
         fileUtils = new FileUtils();
-        queueDownloadableLinkDao = new QueueDownloadableLinkDaoImpl(connection);
+        queueDownloadableLinkDao = new QueueDownloadableLinkDaoImpl(connection, jsonUtils);
         rawDataStorageDao = new RawDataStorageDaoImpl(connection);
         hhDictionaryDao = new HhDictionaryDaoImpl(jsonUtils, fileUtils);
         specialization = hhDictionaryDao.getSpecialization();
@@ -55,20 +58,24 @@ public class App {
         industries = hhDictionaryDao.getIndustries();
         experience = hhDictionaryDao.getExperience();
         initUrlCreator = new InitUrlCreator();
+        seleniumBrowser = new SeleniumBrowser(properties.getProperty("webdriverpath"));
+        jsScript = new JsScript(fileUtils);
+
     }
 
-    private void process() {
-        Properties properties = loadProperties();
+    private void process(Properties properties) {
         try (Connection connection = DriverManager.getConnection(
                 properties.getProperty("url"),
                 properties.getProperty("user"),
                 properties.getProperty("password")))
         {
-            init(connection);
+            init(properties, connection);
             // create base hh url
-            //int sequenceNum = (int) Instant.now().getEpochSecond();
-            //List<DownloadableLink> firstLink = initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, PER_PAGE, cities, specialization, experience, industries);
-            //firstLink.forEach(queueDownloadableLinkDao::createDownloadableLink);
+            int sequenceNum = (int) Instant.now().getEpochSecond();
+            List<DownloadableLink> firstLink = new ArrayList<>();
+            //firstLink.addAll(initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, experience, industries));
+            //firstLink.addAll(initUrlCreator.initHhItResumeLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, Const.HH_SEARCH_PERIOD));
+            firstLink.forEach(queueDownloadableLinkDao::createDownloadableLink);
             Map<UrlHandler, LinkHandler> locatorHandlers = createUrlHandlerLocator();
             processLink(queueDownloadableLinkDao, locatorHandlers);
 
@@ -89,6 +96,12 @@ public class App {
     private Map<UrlHandler, LinkHandler> createUrlHandlerLocator() {
         return Collections.unmodifiableMap(Stream.of(
                 new AbstractMap.SimpleEntry<>(
+                        UrlHandler.HH_RESUME,
+                        new HhResumeHandler(seleniumBrowser, jsScript, rawDataStorageDao, queueDownloadableLinkDao)),
+                new AbstractMap.SimpleEntry<>(
+                        UrlHandler.HH_LIST_RESUME,
+                        new HhListResumeHandler(seleniumBrowser, jsScript, queueDownloadableLinkDao, urlConstructor)),
+                new AbstractMap.SimpleEntry<>(
                         UrlHandler.HH_LIST_VACANCIES,
                         new HhListVacanciesHandler(downloader, jsonUtils, queueDownloadableLinkDao, urlConstructor)),
                 new AbstractMap.SimpleEntry<>(
@@ -99,7 +112,7 @@ public class App {
 
     private Properties loadProperties() {
         Properties properties = new Properties();
-        try (InputStream input = App.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE)){
+        try (InputStream input = App.class.getClassLoader().getResourceAsStream(Const.PROPERTIES_FILE)){
             properties.load(input);
         } catch (IOException e) {
             throw new RuntimeException(e);

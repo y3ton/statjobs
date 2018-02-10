@@ -23,10 +23,6 @@ public class JsScript {
         return loadScript("reumelistparser.js") + "\nreturn findResumes()";
     }
 
-    public String getNextResumeList() {
-        return loadScript("");
-    }
-
     private String loadScript(String scriptName) {
         String script = scriptCache.get(scriptName);
         if (StringUtils.isBlank(script)) {

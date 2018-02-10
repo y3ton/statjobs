@@ -19,8 +19,9 @@ findText = (selector, element) => {
 verify = (obj) => {
 	var text = findText('[class="resume-wrapper"]', document);
 	var json = JSON.stringify(obj);
-	var allow = ["Обо", "мне", "Занятость", "График", "языков", "Повышение", "квалификации", "Опыт", "Ключевые", "навыки", "Знание", "курсы", "Портфолио", "Тесты", "экзамены"];
-	return text.replace(/;|:|,|\n|\t|["']|\\|\(\)/g, " ").replace(/\u0009/g, " ").replace(/\u00a0/g, " ")
+	var allow = ["Обо", "мне", "Занятость", "График", "языков", "Повышение", "квалификации", "Опыт", "Ключевые", "навыки", "Знание", "курсы", "Портфолио", "Тесты", "экзамены", "Результаты", "теста", "Профориентация", "посмотреть",
+	             "Employment", "Key", "About", "Languages", "Professional", "courses", "Tests", "examinations", "Work", "experience"];
+	return text.replace(/;|:|,|\n|\t|«|»|["']|\\|\(\)/g, " ").replace(/\u0009/g, " ").replace(/\u00a0/g, " ")
 	.split(" ")
 	.filter(item => item.length > 1)
 	.filter(item => json.indexOf(item) < 1)
@@ -38,14 +39,20 @@ parseResume = () => {
 	salary: 			findText('[data-qa="resume-block-salary"]', document),
 	specializationC: 	findText('[data-qa="resume-block-specialization-category"]', document),
 	specializationP: 	findObj('[data-qa="resume-block-position-specialization"]', document).map(e => e.innerText),
-	employment: 		findTextContains('p',findObj('[class="resume-block"]', document)[0], "Занятость: "),
-	schedule: 			findTextContains('p',findObj('[class="resume-block"]', document)[0], "График работы: "),
+	employment: 		(findTextContains('p',findObj('[class="resume-block"]', document)[0], "Занятость: ") + " " +
+                         findTextContains('p',findObj('[class="resume-block"]', document)[0], "Employment: ")).trim(),
+	schedule: 			(findTextContains('p',findObj('[class="resume-block"]', document)[0], "График работы: ") + " " +
+                         findTextContains('p',findObj('[class="resume-block"]', document)[0], "Work schedule: ")).trim(),
+	other: 				(findTextContains('[class="resume-block"]', document, "Citizenship, travel time to work") + " " +
+                         findTextContains('[class="resume-block"]', document, "Гражданство, время в пути до работы")).trim(),
+	experience: 		(findTextContains('[class="bloko-columns-row"]', document, "Опыт работы ") + " " +
+                         findTextContains('[class="bloko-columns-row"]', document, "Work experience ")).trim(),
+
 	language: 			findObj('[data-qa="resume-block-language-item"]', document).map(item => item.innerText),
 	skils: 				findObj('[class="Bloko-TagList-Text"]', document).map(item => item.innerText),
 	about: 				findText('[data-qa="resume-block-skills"]', document),
 	driver: 			findText('[data-qa="resume-block-driver-experience"]', document),
-	other: 				findTextContains('[class="resume-block"]', document, "Гражданство, время в пути до работы"),
-	experience: 		findTextContains('[class="resume-block"]', document, "Опыт работы "),
+
 	educationGrade: 	findText('[class="bloko-columns-row"]', (findObj('[data-qa="resume-block-education"]', document)[0])),
 
 	experiencedetail: findObj('[itemprop="worksFor"]', document).map(item => {
@@ -53,6 +60,7 @@ parseResume = () => {
                                duration:    findObj( '[class="bloko-column bloko-column_s-2 bloko-column_m-2 bloko-column_l-2"]', item)[0].innerText,
                                company:     findText('[class="resume-block__sub-title"]', item),
                                address:     findText('[itemprop="address"]', item),
+                               url:         findText('[class="resume__experience-url"]', item),
                                field:       findText('[class="resume-block__experience-gap-bottom"]', item),
                                position:    findText('[data-qa="resume-block-experience-position"]', item),
                                description: findText('[data-qa="resume-block-experience-description"]', item)
@@ -86,8 +94,6 @@ parseResume = () => {
 			}
 		}).filter(item => item.name)
     }
-    if (verify(o).length > 0) {
-        return null;
-    }
+    o.err = verify(o);
     return JSON.stringify(o);
 }
