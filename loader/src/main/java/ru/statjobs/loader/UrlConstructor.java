@@ -3,7 +3,9 @@ package ru.statjobs.loader;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UrlConstructor {
 
@@ -80,6 +82,27 @@ public class UrlConstructor {
         }
         param.add(0, url);
         return StringUtils.join(param, "&");
+    }
+
+    public String getParameter(String parameterName, String url) {
+        if (StringUtils.isBlank(parameterName) || StringUtils.isBlank(url)) {
+            throw new RuntimeException("parametr can not be empty " + parameterName + " " + url);
+        }
+        String[] arr = url.split("\\?");
+        if (arr.length == 1) {
+            return "";
+        }
+        String parameterNameEq = parameterName + "=";
+        List<String> list = Arrays.stream(arr[1].split("&"))
+                .filter(s -> s.startsWith(parameterNameEq))
+                .collect(Collectors.toList());
+        if (list.size() == 0) {
+            return "";
+        } else if (list.size() > 1) {
+            throw new RuntimeException("to many parameters " + parameterName + " in url " + url);
+        } else {
+            return list.get(0).replace(parameterNameEq, "");
+        }
     }
 
 

@@ -3,8 +3,11 @@ package ru.statjobs.loader;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import ru.statjobs.loader.dao.HhDictionaryDaoImpl;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.dto.HhDictionary;
+import ru.statjobs.loader.utils.FileUtils;
+import ru.statjobs.loader.utils.JsonUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +31,7 @@ public class InitHhItResumeLinkTest {
     @Test
     public void createSingleLinkTest() {
         cities.put("msk", "msk");
-        specialization.add(new HhDictionary("specG", "specGC", "spec", "specCode"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "specGC", "spec", "specCode"));
         List<DownloadableLink> list = initUrlCreator.initHhItResumeLink(urlConstructor, 170, 100, cities, specialization, 30);
         Assert.assertEquals(1, list.size());
         DownloadableLink link = list.get(0);
@@ -44,8 +47,8 @@ public class InitHhItResumeLinkTest {
     public void createSeveralLinl() {
         cities.put("msk", "msk");
         cities.put("spb", "spb");
-        specialization.add(new HhDictionary("specG", "specGC", "spec", "specCode"));
-        specialization.add(new HhDictionary("2", "2", "2", "2"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "specGC", "spec", "specCode"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "2", "2", "2"));
         List<DownloadableLink> list = initUrlCreator.initHhItResumeLink(urlConstructor, 170, 100, cities, specialization, 30);
         Assert.assertEquals(4, list.size());
         DownloadableLink link = list.get(0);
@@ -67,6 +70,19 @@ public class InitHhItResumeLinkTest {
                 "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true&specialization=2&search_period=30&area=spb&items_on_page=100",
                 list.get(3).getUrl()
         );
+    }
+
+    @Test
+    public void checkUrlItTelecomFilter() {
+        cities.put("msk", "msk");
+        cities.put("spb", "spb");
+        specialization = new HhDictionaryDaoImpl(new JsonUtils(), new FileUtils()).getSpecialization();
+        List<DownloadableLink> list = initUrlCreator.initHhItResumeLink(urlConstructor, 170, 100, cities, specialization, 30);
+        DownloadableLink link = list.get(0);
+        Assert.assertEquals((Integer) 170, link.getSequenceNum());
+        Assert.assertEquals(UrlHandler.HH_LIST_RESUME.name(), link.getHandlerName());
+        Assert.assertTrue(specialization.size() > 150);
+        Assert.assertTrue(list.size() < 100);
     }
 
 }

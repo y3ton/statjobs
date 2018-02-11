@@ -29,9 +29,11 @@ public class HhResumeHandler implements LinkHandler{
         }
         seleniumBrowser.get(link.getUrl());
         String dateCreate = link.getProps().get(Const.DATE_CREATE_RESUME);
-        String dateCreateJson = String.format("{\"%s\":\"%s\", ", Const.DATE_CREATE_RESUME, dateCreate);
+        String dateCreateJson = String.format("\"%s\":\"%s\"", Const.DATE_CREATE_RESUME, dateCreate);
+        String cityCode = link.getProps().get(Const.AREA_CODE);
+        String cityCodeJson = String.format("\"%s\":\"%s\"", Const.AREA_CODE, cityCode);
         String json = (String) seleniumBrowser.execJs(jsScript.getResume());
-        json = dateCreateJson + json.substring(1);
+        json = "{" + dateCreateJson + "," +  cityCodeJson + "," + json.substring(1);
         if (StringUtils.isBlank(json)) {
             throw new RuntimeException("fail load resume, result is empty " + link.getUrl());
         }

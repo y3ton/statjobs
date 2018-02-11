@@ -20,7 +20,7 @@ verify = (obj) => {
 	var text = findText('[class="resume-wrapper"]', document);
 	var json = JSON.stringify(obj);
 	var allow = ["Обо", "мне", "Занятость", "График", "языков", "Повышение", "квалификации", "Опыт", "Ключевые", "навыки", "Знание", "курсы", "Портфолио", "Тесты", "экзамены", "Результаты", "теста", "Профориентация", "посмотреть",
-	             "Employment", "Key", "About", "Languages", "Professional", "courses", "Tests", "examinations", "Work", "experience"];
+	             "Employment", "Key", "About", "Languages", "Professional", "courses", "Tests", "examinations", "Work", "experience", "development", "Proforinetation", "results", "view", "Portfolio", "skills"];
 	return text.replace(/;|:|,|\n|\t|«|»|["']|\\|\(\)/g, " ").replace(/\u0009/g, " ").replace(/\u00a0/g, " ")
 	.split(" ")
 	.filter(item => item.length > 1)

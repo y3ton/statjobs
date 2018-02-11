@@ -27,11 +27,11 @@ public class InitUrlCreator {
         for (String city: cities.values()) {
             for (String exp: experience.values()) {
                 for (HhDictionary spec: specialization) {
-                    if (!"Информационные технологии, интернет, телеком".equals(spec.getGroup())) {
+                    if (!Const.IT_GROUP_NAME.equals(spec.getGroup())) {
                         continue;
                     }
                     List<String> li;
-                    if ("Программирование, Разработка".equals(spec.getItem()) || "Инженер".equals(spec.getItem())) {
+                    if (Const.IT_IND_PROGRAMMER.equals(spec.getItem()) || Const.IT_IND_ENGINEER.equals(spec.getItem())) {
                         li = listIndustries;
                     } else {
                         li = new ArrayList<>();
@@ -65,6 +65,9 @@ public class InitUrlCreator {
         List<DownloadableLink> links = new ArrayList<>();
         for (String city: cities.values()) {
             for (HhDictionary spec: specialization) {
+                if (!Const.IT_GROUP_NAME.equals(spec.getGroup())) {
+                    continue;
+                }
                 String url = urlConstructor.createHhResumeListUrl(
                         spec.getItemCode(),
                         searchPeriod,

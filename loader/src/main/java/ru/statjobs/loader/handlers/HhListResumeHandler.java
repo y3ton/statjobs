@@ -40,6 +40,7 @@ public class HhListResumeHandler implements  LinkHandler  {
                 .map(list2 -> {
                     Map<String, String> props = new HashMap();
                     props.put(Const.DATE_CREATE_RESUME, formatDate(list2.get(1)));
+                    props.put(Const.AREA_CODE, urlConstructor.getParameter(Const.AREA_CODE, link.getUrl()));
                     return new DownloadableLink(
                             list2.get(0),
                             link.getSequenceNum(),

@@ -130,4 +130,55 @@ public class UrlConstructorTest {
                 urlConstructor.createHhResumeListUrl(null,null,null,null,null));
     }
 
+    @Test
+    public void getEmptyParameterTest() {
+        try {
+            urlConstructor.getParameter(null, null);
+        } catch (RuntimeException e) {
+            Assert.assertTrue(e.getMessage().contains("empty"));
+        }
+        try {
+            urlConstructor.getParameter("", "1");
+        } catch (RuntimeException e) {
+            Assert.assertTrue(e.getMessage().contains("empty"));
+        }
+        try {
+            urlConstructor.getParameter("1", "");
+        } catch (RuntimeException e) {
+            Assert.assertTrue(e.getMessage().contains("empty"));
+        }
+    }
+
+    @Test
+    public void getNotFoundParameter() {
+        Assert.assertEquals("", urlConstructor.getParameter("asd", "dfgdfgdfgd"));
+        Assert.assertEquals("", urlConstructor.getParameter("asd", "www.ya.ru?asd%d=1"));
+    }
+
+    @Test
+    public void getParameterSuccess() {
+        Assert.assertEquals("1", urlConstructor.getParameter("asd", "www.ya.ru?asd=1"));
+        Assert.assertEquals("1", urlConstructor.getParameter("asd", "www.ya.ru?asd=1&d=1"));
+        String url = "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true&specialization=1.327&search_period=30&area=1&items_on_page=100&page=7";
+        Assert.assertEquals("normal", urlConstructor.getParameter("logic", url));
+        Assert.assertEquals("all_time", urlConstructor.getParameter("exp_period", url));
+        Assert.assertEquals("7", urlConstructor.getParameter("page", url));
+        Assert.assertEquals("1", urlConstructor.getParameter(Const.AREA_CODE, url));
+    }
+
+    @Test
+    public void getParameterToMany() {
+        try {
+            urlConstructor.getParameter("asd", "www.ya.ru?asd=1&asd=1&t=1");
+        } catch (RuntimeException e) {
+            Assert.assertTrue(e.getMessage().contains("many"));
+        }
+        try {
+            urlConstructor.getParameter("asd", "www.ya.ru?asd=1&asd=1");
+        } catch (RuntimeException e) {
+            Assert.assertTrue(e.getMessage().contains("many"));
+        }
+
+    }
+
 }

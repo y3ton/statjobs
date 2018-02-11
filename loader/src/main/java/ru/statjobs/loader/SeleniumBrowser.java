@@ -26,6 +26,7 @@ public class SeleniumBrowser {
     }
 
     public void get(String url) {
+        // todo try catch and timeout
         driver.get(url);
     }
 

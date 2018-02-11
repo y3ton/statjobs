@@ -15,10 +15,6 @@ import java.util.stream.Collectors;
 
 public class InitHhItVacancyLinkTest {
 
-    public static final String IT_GROUP_NAME = "Информационные технологии, интернет, телеком";
-    public static final String IT_IND_PROGRAMMER =  "Программирование, Разработка";
-    public static final String IT_IND_ENGINEER = "Инженер";
-
     private InitUrlCreator initUrlCreator = new InitUrlCreator();
     private UrlConstructor urlConstructor = new UrlConstructor();
 
@@ -38,7 +34,7 @@ public class InitHhItVacancyLinkTest {
     @Test
     public void createSingleLinkTest() {
         cities.put("msk", "msk");
-        specialization.add(new HhDictionary(IT_GROUP_NAME, "specGC", "spec", "specCode"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "specGC", "spec", "specCode"));
         experience.put("ex", "ex");
         //industries.add(new HhDictionary("indG", "indGC", "ind", "indCode"));
         List<DownloadableLink> list =
@@ -53,7 +49,7 @@ public class InitHhItVacancyLinkTest {
     @Test
     public void createSingleLinkWithIndustriesTest() {
         cities.put("msk", "msk");
-        specialization.add(new HhDictionary(IT_GROUP_NAME, "specGC", IT_IND_PROGRAMMER, "specCode"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "specGC", Const.IT_IND_PROGRAMMER, "specCode"));
         experience.put("ex", "ex");
         industries.add(new HhDictionary("indG", "indGC", "ind", "indCode"));
         List<DownloadableLink> list =
@@ -69,7 +65,7 @@ public class InitHhItVacancyLinkTest {
     public void createSeveralLinkWithParamCityExperienceTest() {
         cities.put("msk", "msk");
         cities.put("spb", "spb");
-        specialization.add(new HhDictionary(IT_GROUP_NAME, "specGC", "spec", "specCode"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "specGC", "spec", "specCode"));
         experience.put("ex1", "ex1");
         experience.put("ex2", "ex2");
         List<DownloadableLink> list =
@@ -87,8 +83,8 @@ public class InitHhItVacancyLinkTest {
     public void createSeveralLinkWithParamSpecializationIndustriesTest() {
         cities.put("msk", "msk");
         specialization.add(new HhDictionary("NOT_IT_GROUP_NAME", "", "", ""));
-        specialization.add(new HhDictionary(IT_GROUP_NAME, "code1", "spec1", "specCode1"));
-        specialization.add(new HhDictionary(IT_GROUP_NAME, "code1", IT_IND_ENGINEER, "specCode2"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "code1", "spec1", "specCode1"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "code1", Const.IT_IND_ENGINEER, "specCode2"));
         experience.put("ex1", "ex1");
         industries.add(new HhDictionary("Group1", "G1", "i1", "1"));
         industries.add(new HhDictionary("G2", "2", "i2", "2"));
@@ -111,9 +107,9 @@ public class InitHhItVacancyLinkTest {
         cities.put("msk", "msk");
         cities.put("spb", "spb");
         specialization.add(new HhDictionary("NOT_IT_GROUP_NAME", "", "", ""));
-        specialization.add(new HhDictionary(IT_GROUP_NAME, "code1", "spec1", "specCode1"));
-        specialization.add(new HhDictionary(IT_GROUP_NAME, "code1", IT_IND_ENGINEER, "specCode2"));
-        specialization.add(new HhDictionary(IT_GROUP_NAME, "code1", IT_IND_PROGRAMMER, "specCode3"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "code1", "spec1", "specCode1"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "code1", Const.IT_IND_ENGINEER, "specCode2"));
+        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "code1", Const.IT_IND_PROGRAMMER, "specCode3"));
         experience.put("ex1", "ex1");
         experience.put("ex2", "ex2");
         experience.put("ex3", "ex3");
