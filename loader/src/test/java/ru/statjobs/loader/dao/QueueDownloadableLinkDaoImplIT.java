@@ -1,9 +1,9 @@
 package ru.statjobs.loader.dao;
 
 import org.junit.*;
-import ru.statjobs.loader.UrlHandler;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.testutils.H2Utils;
+import ru.statjobs.loader.url.UrlHandler;
 import ru.statjobs.loader.utils.JsonUtils;
 
 import java.io.FileNotFoundException;

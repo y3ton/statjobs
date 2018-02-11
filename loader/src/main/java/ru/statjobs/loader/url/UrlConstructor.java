@@ -1,4 +1,4 @@
-package ru.statjobs.loader;
+package ru.statjobs.loader.url;
 
 import org.apache.commons.lang3.StringUtils;
 

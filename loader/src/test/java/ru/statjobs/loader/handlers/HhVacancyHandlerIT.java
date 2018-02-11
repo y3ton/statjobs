@@ -6,11 +6,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
-import ru.statjobs.loader.UrlHandler;
 import ru.statjobs.loader.dao.QueueDownloadableLinkDaoImpl;
 import ru.statjobs.loader.dao.RawDataStorageDao;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.testutils.H2Utils;
+import ru.statjobs.loader.url.UrlHandler;
 import ru.statjobs.loader.utils.Downloader;
 import ru.statjobs.loader.utils.JsonUtils;
 

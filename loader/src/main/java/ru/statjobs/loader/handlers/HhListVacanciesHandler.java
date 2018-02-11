@@ -1,10 +1,10 @@
 package ru.statjobs.loader.handlers;
 
 import org.apache.commons.lang3.StringUtils;
-import ru.statjobs.loader.UrlConstructor;
-import ru.statjobs.loader.UrlHandler;
 import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
 import ru.statjobs.loader.dto.DownloadableLink;
+import ru.statjobs.loader.url.UrlConstructor;
+import ru.statjobs.loader.url.UrlHandler;
 import ru.statjobs.loader.utils.Downloader;
 import ru.statjobs.loader.utils.JsonUtils;
 

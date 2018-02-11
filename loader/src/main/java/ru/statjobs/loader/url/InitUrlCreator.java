@@ -1,5 +1,6 @@
-package ru.statjobs.loader;
+package ru.statjobs.loader.url;
 
+import ru.statjobs.loader.Const;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.dto.HhDictionary;
 

@@ -1,8 +1,9 @@
-package ru.statjobs.loader;
+package ru.statjobs.loader.url;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import ru.statjobs.loader.Const;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.dto.HhDictionary;
 

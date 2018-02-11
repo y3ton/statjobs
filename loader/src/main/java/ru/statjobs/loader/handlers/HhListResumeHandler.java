@@ -1,8 +1,12 @@
 package ru.statjobs.loader.handlers;
 
-import ru.statjobs.loader.*;
+import ru.statjobs.loader.Const;
+import ru.statjobs.loader.JsScript;
+import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
 import ru.statjobs.loader.dto.DownloadableLink;
+import ru.statjobs.loader.url.UrlConstructor;
+import ru.statjobs.loader.url.UrlHandler;
 
 import java.text.DateFormat;
 import java.text.ParseException;

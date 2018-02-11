@@ -1,7 +1,8 @@
-package ru.statjobs.loader;
+package ru.statjobs.loader.url;
 
 import org.junit.Assert;
 import org.junit.Test;
+import ru.statjobs.loader.Const;
 
 
 public class UrlConstructorTest {
