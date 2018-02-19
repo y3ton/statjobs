@@ -18,6 +18,11 @@ public class FileUtilsIT {
         Assert.assertEquals("123", fileUtils.readFile(fileUtils.getResourceFile(RESOURCE_FILE_NAME)));
     }
 
+    @Test(expected = RuntimeException.class)
+    public void fileNotFoundTest() {
+        fileUtils.readFile(fileUtils.getResourceFile("file no found"));
+    }
+
     @Test
     public void readResourceFileTet() {
         Assert.assertEquals("123", fileUtils.readResourceFile(RESOURCE_FILE_NAME));

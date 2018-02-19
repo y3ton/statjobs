@@ -48,4 +48,16 @@ public class JsonUtilsTest {
         Assert.assertEquals("{\"a\":\"b\"}", jsonUtils.createString(map));
     }
 
+    @Test(expected = RuntimeException.class)
+    public void failParseTest() {
+        jsonUtils.readString("\\/");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void failSaveTest() {
+        Map map = new HashMap();
+        map.put(new Object(), new Object());
+        jsonUtils.createString(map);
+    }
+
 }

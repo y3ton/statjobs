@@ -20,7 +20,7 @@ import java.util.stream.IntStream;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-public class HhListVacanciesHandlerTest {
+public class HhListVacanciesHandlerIT {
 
     private static Connection connection;
     private static WireMockServer wireMockServer = new WireMockServer();
