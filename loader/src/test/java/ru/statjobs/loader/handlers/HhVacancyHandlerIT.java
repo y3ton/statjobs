@@ -5,9 +5,9 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 import ru.statjobs.loader.dao.QueueDownloadableLinkDaoImpl;
 import ru.statjobs.loader.dao.RawDataStorageDao;
+import ru.statjobs.loader.dao.RawDataStorageDaoImpl;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.url.UrlHandler;
@@ -16,9 +16,12 @@ import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 public class HhVacancyHandlerIT {
 
@@ -33,10 +36,11 @@ public class HhVacancyHandlerIT {
     public static void start() throws SQLException {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
         H2Utils.runScript("sql/queue.sql", connection);
+        H2Utils.runScript("sql/raw.sql", connection);
         dao = new QueueDownloadableLinkDaoImpl(connection, new JsonUtils(), false);
 
         downloader = new Downloader();
-        rawDataStorageDao = Mockito.mock(RawDataStorageDao.class);
+        rawDataStorageDao = spy(new RawDataStorageDaoImpl(connection, false));
         wireMockServer.start();
     }
 
@@ -47,9 +51,9 @@ public class HhVacancyHandlerIT {
     }
 
     @Test
-    public void hhVacancyHandlerComplexTest() {
+    public void hhVacancyHandlerComplexTest() throws SQLException {
         HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
-        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 1, UrlHandler.HH_VACANCY.name(), null);
+        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlHandler.HH_VACANCY.name(), null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
 
@@ -60,11 +64,21 @@ public class HhVacancyHandlerIT {
                         .withBody("{[]}")));
         handler.process(dl);
 
-        Mockito.verify(
+        verify(
                 rawDataStorageDao,
-                Mockito.times(1)).saveHhVacancy(Mockito.anyObject(), Mockito.eq("{[]}")
+                times(1)).saveHhVacancy(anyObject(), eq("{[]}")
         );
         Assert.assertFalse(dao.deleteDownloadableLink(dl));
+
+        ResultSet resultSet = connection.createStatement().executeQuery("select URL, DATA, SEQUENCE_NUM from T_HH_RAW_VACANCIES");
+        Assert.assertTrue(resultSet.next());
+
+        Assert.assertEquals("http://localhost:8080/json1", resultSet.getString("URL"));
+        Assert.assertEquals("{[]}", resultSet.getString("DATA"));
+        Assert.assertEquals(181, resultSet.getInt("SEQUENCE_NUM"));
+
+        Assert.assertFalse(resultSet.next());
+        resultSet.close();
     }
 
 }
