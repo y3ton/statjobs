@@ -44,7 +44,18 @@ public class App {
     public static void main(String[] args) throws IOException, SQLException {
         App app = new App();
         Properties props = app.loadProperties();
-        app.process(props);
+        for (int i = 0; i < 10; i++) {
+            try {
+                app.process(props);
+            } finally {
+                app.close();
+            }
+            try {
+                Thread.sleep(15 * 60 *1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void init(Properties properties, Connection connection) {
@@ -64,6 +75,10 @@ public class App {
         seleniumBrowser = new SeleniumBrowser(properties.getProperty("webdriverpath"));
         jsScript = new JsScript(fileUtils);
 
+    }
+
+    private void close() {
+        seleniumBrowser.close();
     }
 
     private void process(Properties properties) {
