@@ -97,7 +97,7 @@ public class HhVacancyHandlerIT {
 
         verify(
                 rawDataStorageDao,
-                times(0)).saveHhVacancy(anyObject(), eq("{[]}")
+                times(0)).saveHhVacancy(anyObject(), anyString()
         );
         Assert.assertFalse(dao.deleteDownloadableLink(dl));
 
@@ -128,7 +128,7 @@ public class HhVacancyHandlerIT {
 
         verify(
                 rawDataStorageDao,
-                times(0)).saveHhVacancy(anyObject(), eq("{[]}")
+                times(0)).saveHhVacancy(anyObject(), anyString()
         );
         Assert.assertTrue(dao.deleteDownloadableLink(dl));
 
