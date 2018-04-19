@@ -29,10 +29,13 @@ public class HhVacancyHandler implements LinkHandler{
     public void process(DownloadableLink link) {
         Downloader.DownloaderResult downloaderResult = downloader.download(link.getUrl(), StandardCharsets.UTF_8, DOWNLOAD_TIMEOUT);
         int responseCode = downloaderResult.getResponseCode();
-        if (responseCode != HttpURLConnection.HTTP_OK) {
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            rawDataStorageDao.saveHhVacancy(link, downloaderResult.getText());
+        } else if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+            // ignore
+        } else {
             throw new RuntimeException("fail load url " + link.getUrl() + ". error code: " + responseCode);
         }
-        rawDataStorageDao.saveHhVacancy(link, downloaderResult.getText());
         queueDownloadableLinkDao.deleteDownloadableLink(link);
     }
 }

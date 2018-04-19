@@ -1,9 +1,9 @@
 package ru.statjobs.loader.handlers;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import ru.statjobs.loader.dao.QueueDownloadableLinkDaoImpl;
 import ru.statjobs.loader.dao.RawDataStorageDao;
@@ -32,8 +32,8 @@ public class HhVacancyHandlerIT {
     private static Downloader downloader;
     private static RawDataStorageDao rawDataStorageDao;
 
-    @BeforeClass
-    public static void start() throws SQLException {
+    @Before
+    public void start() throws SQLException {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
         H2Utils.runScript("sql/queue.sql", connection);
         H2Utils.runScript("sql/raw.sql", connection);
@@ -44,8 +44,8 @@ public class HhVacancyHandlerIT {
         wireMockServer.start();
     }
 
-    @AfterClass
-    public static void stop() throws SQLException {
+    @After
+    public void stop() throws SQLException {
         connection.close();
         wireMockServer.stop();
     }
@@ -80,5 +80,62 @@ public class HhVacancyHandlerIT {
         Assert.assertFalse(resultSet.next());
         resultSet.close();
     }
+
+    @Test
+    public void hhVacancyHandler404Test() throws SQLException {
+        HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
+        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlHandler.HH_VACANCY.name(), null);
+        dao.createDownloadableLink(dl);
+        Assert.assertNotNull(dao.getDownloadableLink());
+
+        stubFor(get(urlEqualTo("/json1"))
+                .willReturn(aResponse()
+                        .withStatus(404)
+                        .withHeader("Content-Type", "text/xml")
+                        .withBody("{[]}")));
+        handler.process(dl);
+
+        verify(
+                rawDataStorageDao,
+                times(0)).saveHhVacancy(anyObject(), eq("{[]}")
+        );
+        Assert.assertFalse(dao.deleteDownloadableLink(dl));
+
+        ResultSet resultSet = connection.createStatement().executeQuery("select URL, DATA, SEQUENCE_NUM from T_HH_RAW_VACANCIES");
+        Assert.assertFalse(resultSet.next());
+        resultSet.close();
+    }
+
+    @Test
+    public void hhVacancyHandler500Test() throws SQLException {
+        HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
+        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlHandler.HH_VACANCY.name(), null);
+        dao.createDownloadableLink(dl);
+        Assert.assertNotNull(dao.getDownloadableLink());
+
+        stubFor(get(urlEqualTo("/json1"))
+                .willReturn(aResponse()
+                        .withStatus(500)
+                        .withHeader("Content-Type", "text/xml")
+                        .withBody("{[]}")));
+        boolean except = false;
+        try {
+            handler.process(dl);
+        } catch (Exception ex) {
+            except = true;
+        }
+        Assert.assertTrue(except);
+
+        verify(
+                rawDataStorageDao,
+                times(0)).saveHhVacancy(anyObject(), eq("{[]}")
+        );
+        Assert.assertTrue(dao.deleteDownloadableLink(dl));
+
+        ResultSet resultSet = connection.createStatement().executeQuery("select URL, DATA, SEQUENCE_NUM from T_HH_RAW_VACANCIES");
+        Assert.assertFalse(resultSet.next());
+        resultSet.close();
+    }
+
 
 }
