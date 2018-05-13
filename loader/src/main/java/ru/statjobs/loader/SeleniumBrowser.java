@@ -16,9 +16,11 @@ public class SeleniumBrowser {
     }
 
     public void start() {
-        System.setProperty("webdriver.chrome.driver", pathDriver);
-        driver = new ChromeDriver();
-        isStart = true;
+        if (!isStart) {
+            System.setProperty("webdriver.chrome.driver", pathDriver);
+            driver = new ChromeDriver();
+            isStart = true;
+        }
     }
 
     public boolean isStart() {
@@ -41,7 +43,10 @@ public class SeleniumBrowser {
     }
 
     public void close() {
-        driver.close();
+        if (isStart) {
+            driver.close();
+            isStart = false;
+        }
     }
 
 

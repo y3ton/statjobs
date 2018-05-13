@@ -1,80 +1,66 @@
-package ru.statjobs.loader;
+package ru.statjobs.loader.app;
 
 
-import ru.statjobs.loader.dao.*;
+import ru.statjobs.loader.Const;
+import ru.statjobs.loader.JsScript;
+import ru.statjobs.loader.SeleniumBrowser;
+import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
+import ru.statjobs.loader.dao.QueueDownloadableLinkDaoImpl;
+import ru.statjobs.loader.dao.RawDataStorageDao;
+import ru.statjobs.loader.dao.RawDataStorageDaoImpl;
 import ru.statjobs.loader.dto.DownloadableLink;
-import ru.statjobs.loader.dto.HhDictionary;
 import ru.statjobs.loader.handlers.*;
-import ru.statjobs.loader.url.InitUrlCreator;
 import ru.statjobs.loader.url.UrlConstructor;
 import ru.statjobs.loader.url.UrlHandler;
 import ru.statjobs.loader.utils.Downloader;
 import ru.statjobs.loader.utils.FileUtils;
 import ru.statjobs.loader.utils.JsonUtils;
+import ru.statjobs.loader.utils.PropertiesUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.Instant;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class App {
-
-
+public class HandlerApp {
 
     private Downloader downloader;
     private UrlConstructor urlConstructor;
     private JsonUtils jsonUtils;
     private QueueDownloadableLinkDao queueDownloadableLinkDao;
     private RawDataStorageDao rawDataStorageDao;
-    private HhDictionaryDao hhDictionaryDao;
-    private List<HhDictionary> specialization;
-    private List<HhDictionary> industries;
-    private Map<String, String> cities;
-    private Map<String, String> experience;
-    private InitUrlCreator initUrlCreator;
     private FileUtils fileUtils;
     private SeleniumBrowser seleniumBrowser;
     private JsScript jsScript;
 
-    public static void main(String[] args) throws IOException, SQLException {
-        App app = new App();
-        Properties props = app.loadProperties();
-        for (int i = 0; i < 10; i++) {
+    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+        HandlerApp handlerApp = new HandlerApp();
+        Properties props = new PropertiesUtils().loadProperties(Const.PROPERTIES_FILE);
+        for (int i = 0; i < Const.HANDLER_RESTART_ATTEMPT; i++) {
             try {
-                app.process(props);
+                handlerApp.process(props);
             } finally {
-                app.close();
+                handlerApp.close();
             }
-            try {
-                Thread.sleep(15 * 60 *1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            Thread.sleep(Const.HANDLER_RESTART_TIMEOUT);
         }
     }
 
     private void init(Properties properties, Connection connection) {
-
         downloader = new Downloader();
         urlConstructor = new UrlConstructor();
         jsonUtils = new JsonUtils();
         fileUtils = new FileUtils();
         queueDownloadableLinkDao = new QueueDownloadableLinkDaoImpl(connection, jsonUtils);
         rawDataStorageDao = new RawDataStorageDaoImpl(connection);
-        hhDictionaryDao = new HhDictionaryDaoImpl(jsonUtils, fileUtils);
-        specialization = hhDictionaryDao.getSpecialization();
-        cities = hhDictionaryDao.getCity();
-        industries = hhDictionaryDao.getIndustries();
-        experience = hhDictionaryDao.getExperience();
-        initUrlCreator = new InitUrlCreator();
         seleniumBrowser = new SeleniumBrowser(properties.getProperty("webdriverpath"));
         jsScript = new JsScript(fileUtils);
-
     }
 
     private void close() {
@@ -88,12 +74,6 @@ public class App {
                 properties.getProperty("password")))
         {
             init(properties, connection);
-            // create base hh url
-            int sequenceNum = (int) Instant.now().getEpochSecond();
-            List<DownloadableLink> firstLink = new ArrayList<>();
-            //firstLink.addAll(initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, experience, industries));
-            //firstLink.addAll(initUrlCreator.initHhItResumeLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, Const.HH_SEARCH_PERIOD));
-            firstLink.forEach(queueDownloadableLinkDao::createDownloadableLink);
             Map<UrlHandler, LinkHandler> locatorHandlers = createUrlHandlerLocator();
             processLink(queueDownloadableLinkDao, locatorHandlers);
 
@@ -128,13 +108,4 @@ public class App {
                 .collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
     }
 
-    private Properties loadProperties() {
-        Properties properties = new Properties();
-        try (InputStream input = App.class.getClassLoader().getResourceAsStream(Const.PROPERTIES_FILE)){
-            properties.load(input);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return properties;
-    }
 }
