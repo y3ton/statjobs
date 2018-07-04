@@ -59,7 +59,10 @@ public class HandlerApp {
         fileUtils = new FileUtils();
         queueDownloadableLinkDao = new QueueDownloadableLinkDaoImpl(connection, jsonUtils);
         rawDataStorageDao = new RawDataStorageDaoImpl(connection);
-        seleniumBrowser = new SeleniumBrowser(properties.getProperty("webdriverpath"));
+        seleniumBrowser = new SeleniumBrowser(
+                properties.getProperty("webdriverpath"),
+                Boolean.valueOf(properties.getProperty("headless")),
+                true);
         jsScript = new JsScript(fileUtils);
     }
 
