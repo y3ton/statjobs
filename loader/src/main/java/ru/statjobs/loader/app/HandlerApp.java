@@ -1,6 +1,8 @@
 package ru.statjobs.loader.app;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
@@ -30,6 +32,8 @@ import java.util.stream.Stream;
 
 public class HandlerApp {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HandlerApp.class);
+
     private Downloader downloader;
     private UrlConstructor urlConstructor;
     private JsonUtils jsonUtils;
@@ -45,9 +49,16 @@ public class HandlerApp {
         for (int i = 0; i < Const.HANDLER_RESTART_ATTEMPT; i++) {
             try {
                 handlerApp.process(props);
+            } catch(Exception ex) {
+                LOGGER.error("Process HandlerApp is fail", ex);
             } finally {
-                handlerApp.close();
+                try {
+                    handlerApp.close();
+                } catch (Exception closeException) {
+                    LOGGER.error("Selenium close fail", closeException);
+                }
             }
+            LOGGER.info("Attempt {} finished, timeout {}", i, Const.HANDLER_RESTART_TIMEOUT);
             Thread.sleep(Const.HANDLER_RESTART_TIMEOUT);
         }
     }
@@ -59,6 +70,7 @@ public class HandlerApp {
         fileUtils = new FileUtils();
         queueDownloadableLinkDao = new QueueDownloadableLinkDaoImpl(connection, jsonUtils);
         rawDataStorageDao = new RawDataStorageDaoImpl(connection);
+        LOGGER.info("webdriverpath: {}", properties.getProperty("webdriverpath"));
         seleniumBrowser = new SeleniumBrowser(
                 properties.getProperty("webdriverpath"),
                 Boolean.valueOf(properties.getProperty("headless")),
@@ -71,6 +83,7 @@ public class HandlerApp {
     }
 
     private void process(Properties properties) {
+        LOGGER.info("connect to DB. url: {}", properties.getProperty("url"));
         try (Connection connection = DriverManager.getConnection(
                 properties.getProperty("url"),
                 properties.getProperty("user"),
@@ -88,7 +101,7 @@ public class HandlerApp {
     private void processLink(QueueDownloadableLinkDao queueDownloadableLinkDao, Map<UrlHandler, LinkHandler> mapHandler) {
         DownloadableLink link;
         while ((link = queueDownloadableLinkDao.getDownloadableLink()) != null) {
-            System.out.println(link.getUrl());
+            LOGGER.info("process url: {}", link.getUrl());
             mapHandler.get(UrlHandler.valueOf(link.getHandlerName()))
                     .process(link);
         }

@@ -1,5 +1,7 @@
 package ru.statjobs.loader.app;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.dao.HhDictionaryDao;
 import ru.statjobs.loader.dao.HhDictionaryDaoImpl;
@@ -25,6 +27,7 @@ import java.util.Properties;
 
 public class InitApp {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(InitApp.class);
 
     private UrlConstructor urlConstructor;
     private JsonUtils jsonUtils;
@@ -59,6 +62,7 @@ public class InitApp {
     }
 
     private void process(Properties properties) {
+        LOGGER.info("connect to DB. url: {}", properties.getProperty("url"));
         try (Connection connection = DriverManager.getConnection(
                 properties.getProperty("url"),
                 properties.getProperty("user"),
@@ -66,10 +70,12 @@ public class InitApp {
         {
             init(connection);
             int sequenceNum = (int) Instant.now().getEpochSecond();
+            LOGGER.info("sequenceNum: {}", sequenceNum);
             List<DownloadableLink> firstLink = new ArrayList<>();
             firstLink.addAll(initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, experience, industries));
             firstLink.addAll(initUrlCreator.initHhItResumeLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, Const.HH_SEARCH_PERIOD));
             firstLink.forEach(queueDownloadableLinkDao::createDownloadableLink);
+            LOGGER.info("create {} link", firstLink.size());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -1,6 +1,8 @@
 package ru.statjobs.loader.handlers;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.url.UrlConstructor;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class HhListVacanciesHandler implements  LinkHandler {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HhListVacanciesHandler.class);
 
     public static final int DOWNLOAD_TIMEOUT = 5000;
 
@@ -37,6 +41,7 @@ public class HhListVacanciesHandler implements  LinkHandler {
 
     @Override
     public void process(DownloadableLink link) {
+        LOGGER.debug("load vacancies list url {}", link.getUrl());
         Downloader.DownloaderResult downloaderResult = downloader.download(link.getUrl(), StandardCharsets.UTF_8, DOWNLOAD_TIMEOUT);
         int responseCode = downloaderResult.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_OK) {

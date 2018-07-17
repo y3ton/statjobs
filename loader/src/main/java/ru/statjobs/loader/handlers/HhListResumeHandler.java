@@ -1,5 +1,7 @@
 package ru.statjobs.loader.handlers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
@@ -15,6 +17,8 @@ import java.util.*;
 
 
 public class HhListResumeHandler implements  LinkHandler  {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HhListResumeHandler.class);
 
     public final DateFormat jsFormat = new SimpleDateFormat("Обновлено dd MMMM, HH:mm", new Locale("ru"));
     public final DateFormat outputFormat = new SimpleDateFormat(Const.DATE_FORMAT, new Locale("ru"));
@@ -34,12 +38,14 @@ public class HhListResumeHandler implements  LinkHandler  {
 
     @Override
     public void process(DownloadableLink link) {
+        LOGGER.debug("parse resume list url {}", link.getUrl());
         if (!seleniumBrowser.isStart()) {
             seleniumBrowser.start();
         }
+        long getUrlStartTime = System.currentTimeMillis();
         seleniumBrowser.get(link.getUrl());
         List<List<String>> list = (List<List<String>>) seleniumBrowser.execJs(jsScript.getResumeList());
-
+        LOGGER.debug("url parse successful. Find {} resumes; elapsed time: {}", list.size(), System.currentTimeMillis() - getUrlStartTime);
         list.stream()
                 .map(list2 -> {
                     Map<String, String> props = new HashMap();
