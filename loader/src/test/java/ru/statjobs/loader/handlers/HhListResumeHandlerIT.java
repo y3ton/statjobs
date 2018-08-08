@@ -4,7 +4,8 @@ import org.junit.*;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDaoImpl;
+import ru.statjobs.loader.dao.DownloadableLinkDao;
+import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.url.UrlConstructor;
@@ -25,7 +26,7 @@ public class HhListResumeHandlerIT {
 
     private static Connection connection;
 
-    private static QueueDownloadableLinkDaoImpl dao;
+    private static DownloadableLinkDao dao;
     private static SeleniumBrowser browser;
     private static JsScript jsScript;
     private static UrlConstructor urlConstructor;
@@ -35,7 +36,7 @@ public class HhListResumeHandlerIT {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
         jsScript = mock(JsScript.class);
         H2Utils.runScript("sql/queue.sql", connection);
-        dao = spy(new QueueDownloadableLinkDaoImpl(connection,  new JsonUtils(), false));
+        dao = spy(new DownloadableLinkDaoPostgresImpl(connection,  new JsonUtils(), false));
         urlConstructor = new UrlConstructor();
     }
 

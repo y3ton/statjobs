@@ -12,10 +12,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class QueueDownloadableLinkDaoImplIT {
+public class DownloadableLinkDaoPostgresImplIT {
 
     private static Connection connection;
-    private static QueueDownloadableLinkDaoImpl dao;
+    private static DownloadableLinkDaoPostgresImpl dao;
 
     JsonUtils jsonUtils = new JsonUtils();
 
@@ -24,7 +24,7 @@ public class QueueDownloadableLinkDaoImplIT {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
         JsonUtils jsonUtils = new JsonUtils();
         H2Utils.runScript("sql/queue.sql", connection);
-        dao = new QueueDownloadableLinkDaoImpl(connection, jsonUtils, false);
+        dao = new DownloadableLinkDaoPostgresImpl(connection, jsonUtils, false);
     }
 
     @AfterClass

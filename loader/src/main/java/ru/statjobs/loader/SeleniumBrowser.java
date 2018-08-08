@@ -29,7 +29,7 @@ public class SeleniumBrowser {
 
     public void start() {
         if (!isStart) {
-            LOGGER.info("start selenium");
+            LOGGER.info("start selenium with param: [path: {}, headless: {}, disableImg: {}]", pathDriver, headless, disableImg);
             System.setProperty("webdriver.chrome.driver", pathDriver);
             ChromeOptions chromeOptions = new ChromeOptions();
             if (disableImg) {

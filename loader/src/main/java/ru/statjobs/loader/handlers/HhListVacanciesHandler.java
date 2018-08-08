@@ -3,7 +3,7 @@ package ru.statjobs.loader.handlers;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
+import ru.statjobs.loader.dao.DownloadableLinkDao;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.url.UrlConstructor;
 import ru.statjobs.loader.url.UrlHandler;
@@ -24,18 +24,18 @@ public class HhListVacanciesHandler implements  LinkHandler {
 
     private final Downloader downloader;
     private final JsonUtils jsonUtils;
-    private final QueueDownloadableLinkDao queueDownloadableLinkDao;
+    private final DownloadableLinkDao downloadableLinkDao;
     private final UrlConstructor urlConstructor;
 
     public HhListVacanciesHandler(
             Downloader downloader,
             JsonUtils jsonUtils,
-            QueueDownloadableLinkDao queueDownloadableLinkDao,
+            DownloadableLinkDao downloadableLinkDao,
             UrlConstructor urlConstructor
     ) {
         this.downloader = downloader;
         this.jsonUtils = jsonUtils;
-        this.queueDownloadableLinkDao = queueDownloadableLinkDao;
+        this.downloadableLinkDao = downloadableLinkDao;
         this.urlConstructor = urlConstructor;
     }
 
@@ -55,7 +55,7 @@ public class HhListVacanciesHandler implements  LinkHandler {
                     .map(item -> (String) item.get("url"))
                     .filter(StringUtils::isNotBlank)
                     .map(urlVacancy -> new DownloadableLink(urlVacancy, link.getSequenceNum(), UrlHandler.HH_VACANCY.name(), null))
-                    .forEach(queueDownloadableLinkDao::createDownloadableLink);
+                    .forEach(downloadableLinkDao::createDownloadableLink);
 
             DownloadableLink nextLink = new DownloadableLink(
                     urlConstructor.hhUrlNextPage(link.getUrl()),
@@ -63,8 +63,8 @@ public class HhListVacanciesHandler implements  LinkHandler {
                     UrlHandler.HH_LIST_VACANCIES.name(),
                     null
             );
-            queueDownloadableLinkDao.createDownloadableLink(nextLink);
+            downloadableLinkDao.createDownloadableLink(nextLink);
         }
-        queueDownloadableLinkDao.deleteDownloadableLink(link);
+        downloadableLinkDao.deleteDownloadableLink(link);
     }
 }

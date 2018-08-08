@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
+import ru.statjobs.loader.dao.DownloadableLinkDao;
 import ru.statjobs.loader.dao.RawDataStorageDao;
 import ru.statjobs.loader.dto.DownloadableLink;
 
@@ -17,9 +17,9 @@ public class HhResumeHandler implements LinkHandler{
     private final SeleniumBrowser seleniumBrowser;
     private final JsScript jsScript;
     private final RawDataStorageDao rawDataStorageDao;
-    private final QueueDownloadableLinkDao queueDownloadableLinkDao;
+    private final DownloadableLinkDao queueDownloadableLinkDao;
 
-    public HhResumeHandler(SeleniumBrowser seleniumBrowser, JsScript jsScript, RawDataStorageDao rawDataStorageDao, QueueDownloadableLinkDao queueDownloadableLinkDao) {
+    public HhResumeHandler(SeleniumBrowser seleniumBrowser, JsScript jsScript, RawDataStorageDao rawDataStorageDao, DownloadableLinkDao queueDownloadableLinkDao) {
         this.seleniumBrowser = seleniumBrowser;
         this.jsScript = jsScript;
         this.rawDataStorageDao = rawDataStorageDao;

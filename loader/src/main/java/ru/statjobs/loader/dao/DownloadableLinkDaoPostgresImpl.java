@@ -7,7 +7,7 @@ import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.*;
 
-public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
+public class DownloadableLinkDaoPostgresImpl implements DownloadableLinkDao {
 
     public final static int MAX_ATTEMPT_GET_LINK = 10;
 
@@ -15,11 +15,11 @@ public class QueueDownloadableLinkDaoImpl implements QueueDownloadableLinkDao {
     private final JsonUtils jsonUtils;
     private final boolean postgresMode;
 
-    public QueueDownloadableLinkDaoImpl(Connection connection, JsonUtils jsonUtils) {
+    public DownloadableLinkDaoPostgresImpl(Connection connection, JsonUtils jsonUtils) {
         this(connection, jsonUtils, true);
     }
 
-    public QueueDownloadableLinkDaoImpl(Connection connection, JsonUtils jsonUtils, boolean postgresMode) {
+    public DownloadableLinkDaoPostgresImpl(Connection connection, JsonUtils jsonUtils, boolean postgresMode) {
         this.connection = connection;
         this.jsonUtils = jsonUtils;
         this.postgresMode = postgresMode;

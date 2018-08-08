@@ -2,7 +2,7 @@ package ru.statjobs.loader.dao;
 
 import ru.statjobs.loader.dto.DownloadableLink;
 
-public interface QueueDownloadableLinkDao {
+public interface DownloadableLinkDao {
 
     boolean createDownloadableLink(DownloadableLink link);
 

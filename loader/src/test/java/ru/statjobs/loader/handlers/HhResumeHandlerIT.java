@@ -7,9 +7,10 @@ import org.junit.Test;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDaoImpl;
+import ru.statjobs.loader.dao.DownloadableLinkDao;
+import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.dao.RawDataStorageDao;
-import ru.statjobs.loader.dao.RawDataStorageDaoImpl;
+import ru.statjobs.loader.dao.RawDataStorageDaoPostgresImpl;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.url.UrlHandler;
@@ -28,7 +29,7 @@ public class HhResumeHandlerIT {
 
 
     private static Connection connection;
-    private static QueueDownloadableLinkDaoImpl dao;
+    private static DownloadableLinkDao dao;
     private static RawDataStorageDao rawDataStorageDao;
     private static SeleniumBrowser browser;
     private static JsScript jsScript;
@@ -38,8 +39,8 @@ public class HhResumeHandlerIT {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
         H2Utils.runScript("sql/queue.sql", connection);
         H2Utils.runScript("sql/raw.sql", connection);
-        dao = new QueueDownloadableLinkDaoImpl(connection, new JsonUtils(), false);
-        rawDataStorageDao = spy(new RawDataStorageDaoImpl(connection, false));
+        dao = new DownloadableLinkDaoPostgresImpl(connection, new JsonUtils(), false);
+        rawDataStorageDao = spy(new RawDataStorageDaoPostgresImpl(connection, false));
         jsScript = mock(JsScript.class);
         browser = mock(SeleniumBrowser.class);
     }

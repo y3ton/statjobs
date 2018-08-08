@@ -5,9 +5,10 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDaoImpl;
+import ru.statjobs.loader.dao.DownloadableLinkDao;
+import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.dao.RawDataStorageDao;
-import ru.statjobs.loader.dao.RawDataStorageDaoImpl;
+import ru.statjobs.loader.dao.RawDataStorageDaoPostgresImpl;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.url.UrlHandler;
@@ -28,7 +29,7 @@ public class HhVacancyHandlerIT {
     private static Connection connection;
     private static WireMockServer wireMockServer = new WireMockServer();
 
-    private static QueueDownloadableLinkDaoImpl dao;
+    private static DownloadableLinkDao dao;
     private static Downloader downloader;
     private static RawDataStorageDao rawDataStorageDao;
 
@@ -37,10 +38,10 @@ public class HhVacancyHandlerIT {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
         H2Utils.runScript("sql/queue.sql", connection);
         H2Utils.runScript("sql/raw.sql", connection);
-        dao = new QueueDownloadableLinkDaoImpl(connection, new JsonUtils(), false);
+        dao = new DownloadableLinkDaoPostgresImpl(connection, new JsonUtils(), false);
 
         downloader = new Downloader();
-        rawDataStorageDao = spy(new RawDataStorageDaoImpl(connection, false));
+        rawDataStorageDao = spy(new RawDataStorageDaoPostgresImpl(connection, false));
         wireMockServer.start();
     }
 

@@ -13,7 +13,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class RawDataStorageDaoImplTest {
+public class RawDataStorageDaoPostgresImplTest {
 
     @Test
     public void saveHhRawTest() throws SQLException {
@@ -22,7 +22,7 @@ public class RawDataStorageDaoImplTest {
         PreparedStatement preparedStatement = mock(PreparedStatement.class);
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 
-        RawDataStorageDao dao = new RawDataStorageDaoImpl(connection);
+        RawDataStorageDao dao = new RawDataStorageDaoPostgresImpl(connection);
         DownloadableLink link = new DownloadableLink("url", 177, "handler", null);
 
         dao.saveHhVacancy(link, "json_1" );

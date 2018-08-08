@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
+import ru.statjobs.loader.dao.DownloadableLinkDao;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.url.UrlConstructor;
 import ru.statjobs.loader.url.UrlHandler;
@@ -25,14 +25,19 @@ public class HhListResumeHandler implements  LinkHandler  {
 
     private final SeleniumBrowser seleniumBrowser;
     private final JsScript jsScript;
-    private final QueueDownloadableLinkDao queueDownloadableLinkDao;
+    private final DownloadableLinkDao downloadableLinkDao;
     private final UrlConstructor urlConstructor;
 
 
-    public HhListResumeHandler(SeleniumBrowser seleniumBrowser, JsScript jsScript, QueueDownloadableLinkDao queueDownloadableLinkDao, UrlConstructor urlConstructor) {
+    public HhListResumeHandler(
+            SeleniumBrowser seleniumBrowser,
+            JsScript jsScript,
+            DownloadableLinkDao downloadableLinkDao,
+            UrlConstructor urlConstructor
+    ) {
         this.seleniumBrowser = seleniumBrowser;
         this.jsScript = jsScript;
-        this.queueDownloadableLinkDao = queueDownloadableLinkDao;
+        this.downloadableLinkDao = downloadableLinkDao;
         this.urlConstructor = urlConstructor;
     }
 
@@ -57,11 +62,11 @@ public class HhListResumeHandler implements  LinkHandler  {
                             UrlHandler.HH_RESUME.name(),
                             props);
                 })
-                .forEach(queueDownloadableLinkDao::createDownloadableLink);
+                .forEach(downloadableLinkDao::createDownloadableLink);
 
         long i = (long) seleniumBrowser.execJs("return document.querySelectorAll('[data-qa=\"pager-next\"]').length");
         if (i > 0) {
-            queueDownloadableLinkDao.createDownloadableLink(
+            downloadableLinkDao.createDownloadableLink(
                         new DownloadableLink(
                             urlConstructor.hhUrlNextPage(link.getUrl()),
                             link.getSequenceNum(),
@@ -70,7 +75,7 @@ public class HhListResumeHandler implements  LinkHandler  {
                         )
             );
         }
-        queueDownloadableLinkDao.deleteDownloadableLink(link);
+        downloadableLinkDao.deleteDownloadableLink(link);
 
     }
 

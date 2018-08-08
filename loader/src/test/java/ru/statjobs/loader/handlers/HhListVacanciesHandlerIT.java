@@ -2,7 +2,8 @@ package ru.statjobs.loader.handlers;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.*;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDaoImpl;
+import ru.statjobs.loader.dao.DownloadableLinkDao;
+import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.url.UrlConstructor;
@@ -25,7 +26,7 @@ public class HhListVacanciesHandlerIT {
     private static Connection connection;
     private static WireMockServer wireMockServer = new WireMockServer();
 
-    private static QueueDownloadableLinkDaoImpl dao;
+    private static DownloadableLinkDao dao;
     private static Downloader downloader;
     private static UrlConstructor urlConstructor;
     private static JsonUtils jsonUtils;
@@ -35,7 +36,7 @@ public class HhListVacanciesHandlerIT {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
         jsonUtils = new JsonUtils();
         H2Utils.runScript("sql/queue.sql", connection);
-        dao = new QueueDownloadableLinkDaoImpl(connection, jsonUtils, false);
+        dao = new DownloadableLinkDaoPostgresImpl(connection, jsonUtils, false);
         downloader = new Downloader();
         urlConstructor = new UrlConstructor();
         wireMockServer.start();

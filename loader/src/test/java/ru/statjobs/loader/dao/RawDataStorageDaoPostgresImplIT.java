@@ -6,16 +6,16 @@ import ru.statjobs.loader.testutils.H2Utils;
 
 import java.sql.*;
 
-public class RawDataStorageDaoImplIT {
+public class RawDataStorageDaoPostgresImplIT {
 
     private static Connection connection;
-    private static RawDataStorageDaoImpl dao;
+    private static RawDataStorageDaoPostgresImpl dao;
 
     @BeforeClass
     public static void start() throws SQLException {
         connection = DriverManager.getConnection ("jdbc:h2:mem:test;MODE=PostgreSQL");
         H2Utils.runScript("sql/raw.sql", connection);
-        dao = new RawDataStorageDaoImpl(connection, false);
+        dao = new RawDataStorageDaoPostgresImpl(connection, false);
    }
 
     @AfterClass

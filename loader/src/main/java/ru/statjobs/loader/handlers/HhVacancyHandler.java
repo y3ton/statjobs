@@ -2,7 +2,7 @@ package ru.statjobs.loader.handlers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
+import ru.statjobs.loader.dao.DownloadableLinkDao;
 import ru.statjobs.loader.dao.RawDataStorageDao;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.utils.Downloader;
@@ -17,16 +17,16 @@ public class HhVacancyHandler implements LinkHandler{
     public static final int DOWNLOAD_TIMEOUT = 5000;
     private final Downloader downloader;
     private final RawDataStorageDao rawDataStorageDao;
-    private final QueueDownloadableLinkDao queueDownloadableLinkDao;
+    private final DownloadableLinkDao downloadableLinkDao;
 
     public HhVacancyHandler(
             Downloader downloader,
             RawDataStorageDao rawDataStorageDao,
-            QueueDownloadableLinkDao queueDownloadableLinkDao
+            DownloadableLinkDao downloadableLinkDao
     ) {
         this.downloader = downloader;
         this.rawDataStorageDao = rawDataStorageDao;
-        this.queueDownloadableLinkDao = queueDownloadableLinkDao;
+        this.downloadableLinkDao = downloadableLinkDao;
     }
 
     @Override
@@ -41,6 +41,6 @@ public class HhVacancyHandler implements LinkHandler{
         } else {
             throw new RuntimeException("fail load url: " + link.getUrl() + ". error code: " + responseCode);
         }
-        queueDownloadableLinkDao.deleteDownloadableLink(link);
+        downloadableLinkDao.deleteDownloadableLink(link);
     }
 }

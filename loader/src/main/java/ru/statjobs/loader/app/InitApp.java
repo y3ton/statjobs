@@ -3,10 +3,10 @@ package ru.statjobs.loader.app;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.Const;
+import ru.statjobs.loader.dao.DownloadableLinkDao;
+import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.dao.HhDictionaryDao;
 import ru.statjobs.loader.dao.HhDictionaryDaoImpl;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDao;
-import ru.statjobs.loader.dao.QueueDownloadableLinkDaoImpl;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.dto.HhDictionary;
 import ru.statjobs.loader.url.InitUrlCreator;
@@ -31,7 +31,7 @@ public class InitApp {
 
     private UrlConstructor urlConstructor;
     private JsonUtils jsonUtils;
-    private QueueDownloadableLinkDao queueDownloadableLinkDao;
+    private DownloadableLinkDao qownloadableLinkDao;
 
     private HhDictionaryDao hhDictionaryDao;
     private List<HhDictionary> specialization;
@@ -52,7 +52,7 @@ public class InitApp {
         urlConstructor = new UrlConstructor();
         jsonUtils = new JsonUtils();
         fileUtils = new FileUtils();
-        queueDownloadableLinkDao = new QueueDownloadableLinkDaoImpl(connection, jsonUtils);
+        qownloadableLinkDao = new DownloadableLinkDaoPostgresImpl(connection, jsonUtils);
         hhDictionaryDao = new HhDictionaryDaoImpl(jsonUtils, fileUtils);
         specialization = hhDictionaryDao.getSpecialization();
         cities = hhDictionaryDao.getCity();
@@ -74,7 +74,7 @@ public class InitApp {
             List<DownloadableLink> firstLink = new ArrayList<>();
             firstLink.addAll(initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, experience, industries));
             firstLink.addAll(initUrlCreator.initHhItResumeLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, Const.HH_SEARCH_PERIOD));
-            firstLink.forEach(queueDownloadableLinkDao::createDownloadableLink);
+            firstLink.forEach(qownloadableLinkDao::createDownloadableLink);
             LOGGER.info("create {} link", firstLink.size());
         } catch (SQLException e) {
             throw new RuntimeException(e);

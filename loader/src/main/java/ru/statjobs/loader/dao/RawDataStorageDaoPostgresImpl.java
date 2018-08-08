@@ -7,17 +7,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-public class RawDataStorageDaoImpl implements RawDataStorageDao {
+public class RawDataStorageDaoPostgresImpl implements RawDataStorageDao {
 
     private final Connection connection;
 
     private final boolean postgresMode;
 
-    public RawDataStorageDaoImpl(Connection connection) {
+    public RawDataStorageDaoPostgresImpl(Connection connection) {
         this(connection, true);
     }
 
-    public RawDataStorageDaoImpl(Connection connection, boolean postgresMode) {
+    public RawDataStorageDaoPostgresImpl(Connection connection, boolean postgresMode) {
         this.connection = connection;
         this.postgresMode = postgresMode;
     }
