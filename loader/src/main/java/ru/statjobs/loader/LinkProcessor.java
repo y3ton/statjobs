@@ -24,7 +24,7 @@ public class LinkProcessor {
     final private Downloader downloader;
     final private UrlConstructor urlConstructor;
     final private JsonUtils jsonUtils;
-    final private DownloadableLinkDao queueDownloadableLinkDao;
+    final private DownloadableLinkDao downloadableLinkDao;
     final private RawDataStorageDao rawDataStorageDao;
     final private SeleniumBrowser seleniumBrowser;
     final private JsScript jsScript;
@@ -33,7 +33,7 @@ public class LinkProcessor {
             Downloader downloader,
             UrlConstructor urlConstructor,
             JsonUtils jsonUtils,
-            DownloadableLinkDao queueDownloadableLinkDao,
+            DownloadableLinkDao downloadableLinkDao,
             RawDataStorageDao rawDataStorageDao,
             SeleniumBrowser seleniumBrowser,
             JsScript jsScript
@@ -41,16 +41,16 @@ public class LinkProcessor {
         this.downloader = downloader;
         this.urlConstructor = urlConstructor;
         this.jsonUtils = jsonUtils;
-        this.queueDownloadableLinkDao = queueDownloadableLinkDao;
+        this.downloadableLinkDao = downloadableLinkDao;
         this.rawDataStorageDao = rawDataStorageDao;
         this.seleniumBrowser = seleniumBrowser;
         this.jsScript = jsScript;
     }
 
-    public void processLink(DownloadableLinkDao queueDownloadableLinkDao) {
+    public void processLinks() {
         Map<UrlHandler, LinkHandler> mapHandler = createUrlHandlerLocator();
         DownloadableLink link;
-        while ((link = queueDownloadableLinkDao.getDownloadableLink()) != null) {
+        while ((link = downloadableLinkDao.getDownloadableLink()) != null) {
             LOGGER.info("process url: {}", link.getUrl());
             mapHandler.get(UrlHandler.valueOf(link.getHandlerName()))
                     .process(link);
@@ -61,16 +61,16 @@ public class LinkProcessor {
         return Collections.unmodifiableMap(Stream.of(
                 new AbstractMap.SimpleEntry<>(
                         UrlHandler.HH_RESUME,
-                        new HhResumeHandler(seleniumBrowser, jsScript, rawDataStorageDao, queueDownloadableLinkDao)),
+                        new HhResumeHandler(seleniumBrowser, jsScript, rawDataStorageDao, downloadableLinkDao)),
                 new AbstractMap.SimpleEntry<>(
                         UrlHandler.HH_LIST_RESUME,
-                        new HhListResumeHandler(seleniumBrowser, jsScript, queueDownloadableLinkDao, urlConstructor)),
+                        new HhListResumeHandler(seleniumBrowser, jsScript, downloadableLinkDao, urlConstructor)),
                 new AbstractMap.SimpleEntry<>(
                         UrlHandler.HH_LIST_VACANCIES,
-                        new HhListVacanciesHandler(downloader, jsonUtils, queueDownloadableLinkDao, urlConstructor)),
+                        new HhListVacanciesHandler(downloader, jsonUtils, downloadableLinkDao, urlConstructor)),
                 new AbstractMap.SimpleEntry<>(
                         UrlHandler.HH_VACANCY,
-                        new HhVacancyHandler(downloader, rawDataStorageDao, queueDownloadableLinkDao)))
+                        new HhVacancyHandler(downloader, rawDataStorageDao, downloadableLinkDao)))
                 .collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
     }
 

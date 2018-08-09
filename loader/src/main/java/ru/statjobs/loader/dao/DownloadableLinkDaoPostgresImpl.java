@@ -2,14 +2,13 @@ package ru.statjobs.loader.dao;
 
 
 import org.javatuples.Pair;
+import ru.statjobs.loader.Const;
 import ru.statjobs.loader.dto.DownloadableLink;
 import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.*;
 
 public class DownloadableLinkDaoPostgresImpl implements DownloadableLinkDao {
-
-    public final static int MAX_ATTEMPT_GET_LINK = 10;
 
     private final Connection connection;
     private final JsonUtils jsonUtils;
@@ -85,7 +84,7 @@ public class DownloadableLinkDaoPostgresImpl implements DownloadableLinkDao {
 
     @Override
     public DownloadableLink getDownloadableLink() {
-        for (int i = 0; i < MAX_ATTEMPT_GET_LINK; i++) {
+        for (int i = 0; i < Const.MAX_ATTEMPT_GET_LINK; i++) {
             Pair<Integer, DownloadableLink> pair = selectRandomDownloadableLink();
             if (pair == null) {
                 return null;

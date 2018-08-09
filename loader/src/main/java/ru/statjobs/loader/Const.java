@@ -16,4 +16,6 @@ public class Const {
 
     public static final int HANDLER_RESTART_TIMEOUT = 15 * 60 *1000;
     public static final int HANDLER_RESTART_ATTEMPT = 10;
+
+    public final static int MAX_ATTEMPT_GET_LINK = 10;
 }

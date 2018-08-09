@@ -83,7 +83,7 @@ public class HandlerApp {
                 properties.getProperty("password")))
         {
             init(properties, connection);
-            linkProcessor.processLink(downloadableLinkDao);
+            linkProcessor.processLinks();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
