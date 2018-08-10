@@ -4,10 +4,10 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.*;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.url.UrlHandler;
 import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.url.UrlConstructor;
-import ru.statjobs.loader.url.UrlHandler;
 import ru.statjobs.loader.utils.Downloader;
 import ru.statjobs.loader.utils.JsonUtils;
 

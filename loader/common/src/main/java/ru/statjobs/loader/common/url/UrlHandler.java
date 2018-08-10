@@ -1,4 +1,4 @@
-package ru.statjobs.loader.url;
+package ru.statjobs.loader.common.url;
 
 public enum UrlHandler {
 

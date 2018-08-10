@@ -3,6 +3,7 @@ package ru.statjobs.loader.url;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.HhDictionary;
+import ru.statjobs.loader.common.url.UrlHandler;
 
 import java.util.ArrayList;
 import java.util.List;

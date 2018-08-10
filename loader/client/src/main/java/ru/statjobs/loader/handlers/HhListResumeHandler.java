@@ -7,8 +7,8 @@ import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.url.UrlHandler;
 import ru.statjobs.loader.url.UrlConstructor;
-import ru.statjobs.loader.url.UrlHandler;
 
 import java.text.DateFormat;
 import java.text.ParseException;

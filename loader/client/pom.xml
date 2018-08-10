@@ -22,6 +22,10 @@
             <groupId>statjobs.ru</groupId>
             <artifactId>common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>statjobs.ru</groupId>
+            <artifactId>dao</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -31,10 +35,7 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

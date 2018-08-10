@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.url.UrlHandler;
 import ru.statjobs.loader.handlers.*;
 import ru.statjobs.loader.url.UrlConstructor;
-import ru.statjobs.loader.url.UrlHandler;
 import ru.statjobs.loader.utils.Downloader;
 import ru.statjobs.loader.utils.JsonUtils;
 

@@ -10,10 +10,10 @@ import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.url.UrlHandler;
 import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.dao.RawDataStorageDaoPostgresImpl;
 import ru.statjobs.loader.testutils.H2Utils;
-import ru.statjobs.loader.url.UrlHandler;
 import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.Connection;

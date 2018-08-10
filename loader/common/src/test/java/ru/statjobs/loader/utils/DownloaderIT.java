@@ -1,6 +1,7 @@
 package ru.statjobs.loader.utils;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -8,8 +9,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class DownloaderIT  {
 
@@ -31,8 +30,8 @@ public class DownloaderIT  {
 
     @Test
     public void test200() throws InterruptedException {
-        stubFor(get(urlEqualTo("/test200"))
-                .willReturn(aResponse()
+        WireMock.stubFor(WireMock.get(WireMock.urlEqualTo("/test200"))
+                .willReturn(WireMock.aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "text/xml")
                         .withBody("ok!")));
@@ -49,8 +48,8 @@ public class DownloaderIT  {
 
     @Test(expected = java.lang.RuntimeException.class)
     public void testTimeoutException() throws InterruptedException {
-        stubFor(get("/delayed").willReturn(
-                aResponse()
+        WireMock.stubFor(WireMock.get("/delayed").willReturn(
+                WireMock.aResponse()
                         .withStatus(200)
                         .withBody("ok!")
                         .withChunkedDribbleDelay(5, 1000)));

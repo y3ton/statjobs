@@ -2,16 +2,15 @@ package ru.statjobs.loader.utils;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.statjobs.loader.Const;
 
 import java.util.Properties;
 
 public class PropertiesUtilsIT {
 
     @Test
-    public void loadPropertiesTes() {
+    public void loadPropertiesTest() {
         PropertiesUtils propertiesUtils = new PropertiesUtils();
-        Properties props = propertiesUtils.loadProperties(Const.PROPERTIES_FILE);
+        Properties props = propertiesUtils.loadProperties("app.properties");
         Assert.assertEquals("aaa", props.getProperty("a"));
         Assert.assertEquals("bbb", props.getProperty("b"));
         Assert.assertEquals("password", props.getProperty("password"));

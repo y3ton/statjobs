@@ -19,6 +19,7 @@
 	<modules>
         <module>client</module>
         <module>common</module>
+        <module>dao</module>
     </modules>
 
     <dependencyManagement>
@@ -27,6 +28,11 @@
             <dependency>
                 <groupId>statjobs.ru</groupId>
                 <artifactId>common</artifactId>
+                <version>${statjobs.project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>statjobs.ru</groupId>
+                <artifactId>dao</artifactId>
                 <version>${statjobs.project.version}</version>
             </dependency>
 

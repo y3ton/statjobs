@@ -6,6 +6,7 @@ import org.junit.Test;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.HhDictionary;
+import ru.statjobs.loader.common.url.UrlHandler;
 import ru.statjobs.loader.dao.HhDictionaryDaoImpl;
 import ru.statjobs.loader.utils.FileUtils;
 import ru.statjobs.loader.utils.JsonUtils;
