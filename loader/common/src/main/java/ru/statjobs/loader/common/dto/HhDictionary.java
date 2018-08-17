@@ -1,6 +1,8 @@
 package ru.statjobs.loader.common.dto;
 
-public class HhDictionary {
+import java.io.Serializable;
+
+public class HhDictionary implements Serializable {
 
     private final String group;
     private final String groupCode;

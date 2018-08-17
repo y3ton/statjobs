@@ -1,8 +1,11 @@
 package ru.statjobs.loader.common.dto;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.io.Serializable;
 import java.util.Map;
 
-public class DownloadableLink {
+public class DownloadableLink implements Serializable {
 
     private final String url;
     private final Integer sequenceNum;
@@ -30,5 +33,15 @@ public class DownloadableLink {
 
     public Map<String, String> getProps() {
         return props;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("url", url)
+                .append("sequenceNum", sequenceNum)
+                .append("handlerName", handlerName)
+                .append("props", props)
+                .toString();
     }
 }

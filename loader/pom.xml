@@ -14,12 +14,28 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <logback.version>1.2.3</logback.version>
         <statjobs.project.version>1.0-SNAPSHOT</statjobs.project.version>
+        <spring.version>5.0.8.RELEASE</spring.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>repository.jboss.org-public</id>
+            <name>JBoss.org Maven repository</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
 	
 	<modules>
         <module>client</module>
         <module>common</module>
         <module>dao</module>
+        <module>loadsrv</module>
     </modules>
 
     <dependencyManagement>
@@ -34,6 +50,29 @@
                 <groupId>statjobs.ru</groupId>
                 <artifactId>dao</artifactId>
                 <version>${statjobs.project.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>javax.jms</groupId>
+                <artifactId>jms</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.jms</groupId>
+                <artifactId>javax.jms-api</artifactId>
+                <version>2.0.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jms</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
             </dependency>
 
             <dependency>
@@ -100,6 +139,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.apache.activemq</groupId>
+                <version>5.15.5</version>
+                <artifactId>activemq-all</artifactId>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.github.tomakehurst</groupId>
                 <artifactId>wiremock</artifactId>
                 <version>2.12.0</version>
@@ -155,22 +200,7 @@
                     </execution>
                 </executions>
             </plugin>
-<!--            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.0.1</version>
-                <configuration>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
+
         </plugins>
     </build>
 

@@ -9,4 +9,5 @@
 target
 .idea
 *.iml
+**/activemq-data/
 node_modules
