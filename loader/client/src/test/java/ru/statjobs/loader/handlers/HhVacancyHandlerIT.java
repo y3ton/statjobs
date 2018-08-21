@@ -8,7 +8,7 @@ import org.junit.Test;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.dao.RawDataStorageDaoPostgresImpl;
 import ru.statjobs.loader.testutils.H2Utils;
@@ -54,7 +54,7 @@ public class HhVacancyHandlerIT {
     @Test
     public void hhVacancyHandlerComplexTest() throws SQLException {
         HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
-        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlHandler.HH_VACANCY.name(), null);
+        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlTypes.HH_VACANCY, null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
 
@@ -85,7 +85,7 @@ public class HhVacancyHandlerIT {
     @Test
     public void hhVacancyHandler404Test() throws SQLException {
         HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
-        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlHandler.HH_VACANCY.name(), null);
+        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlTypes.HH_VACANCY, null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
 
@@ -110,7 +110,7 @@ public class HhVacancyHandlerIT {
     @Test
     public void hhVacancyHandler500Test() throws SQLException {
         HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
-        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlHandler.HH_VACANCY.name(), null);
+        DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlTypes.HH_VACANCY, null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
 

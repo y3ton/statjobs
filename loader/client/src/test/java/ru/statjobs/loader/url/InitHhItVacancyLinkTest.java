@@ -6,7 +6,7 @@ import org.junit.Test;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.HhDictionary;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ public class InitHhItVacancyLinkTest {
         Assert.assertEquals(1, list.size());
         DownloadableLink link = list.get(0);
         Assert.assertEquals((Integer) 170, link.getSequenceNum());
-        Assert.assertEquals(UrlHandler.HH_LIST_VACANCIES.name(), link.getHandlerName());
+        Assert.assertEquals(UrlTypes.HH_LIST_VACANCIES, link.getHandlerName());
         Assert.assertEquals("https://api.hh.ru/vacancies?specialization=specCode&area=msk&experience=ex", link.getUrl());
     }
 
@@ -59,7 +59,7 @@ public class InitHhItVacancyLinkTest {
         Assert.assertEquals(1, list.size());
         DownloadableLink link = list.get(0);
         Assert.assertEquals((Integer) 0, link.getSequenceNum());
-        Assert.assertEquals(UrlHandler.HH_LIST_VACANCIES.name(), link.getHandlerName());
+        Assert.assertEquals(UrlTypes.HH_LIST_VACANCIES, link.getHandlerName());
         Assert.assertEquals("https://api.hh.ru/vacancies?specialization=specCode&area=msk&experience=ex&industry=indCode", link.getUrl());
     }
 
@@ -123,7 +123,7 @@ public class InitHhItVacancyLinkTest {
                 initUrlCreator.initHhItVacancyLink(urlConstructor, 80,0, cities, specialization, experience, industries);
         Assert.assertEquals(54, list.size());
         long n = list.stream()
-                .filter(dLink -> dLink.getHandlerName().equals(UrlHandler.HH_LIST_VACANCIES.name()))
+                .filter(dLink -> dLink.getHandlerName().equals(UrlTypes.HH_LIST_VACANCIES))
                 .filter(dLink -> dLink.getSequenceNum().equals(80))
                 .count();
         Assert.assertEquals(54L, n);

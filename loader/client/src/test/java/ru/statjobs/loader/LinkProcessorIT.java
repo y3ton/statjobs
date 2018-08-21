@@ -4,7 +4,7 @@ import org.junit.*;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.url.UrlConstructor;
@@ -64,7 +64,7 @@ public class LinkProcessorIT {
 
     @Test
     public void hhResumeHandlerEmptyTest() {
-        dao.createDownloadableLink(new DownloadableLink("hhResumeHandlerEmptyTest", 1, UrlHandler.HH_RESUME.name(), null));
+        dao.createDownloadableLink(new DownloadableLink("hhResumeHandlerEmptyTest", 1, UrlTypes.HH_RESUME, null));
         doReturn("").when(seleniumBrowser).execJs(anyString());
         try {
             processor.processLinks();
@@ -79,7 +79,7 @@ public class LinkProcessorIT {
 
     @Test
     public void hhResumeHandlerTest() {
-        dao.createDownloadableLink(new DownloadableLink("hhResumeHandlerTest", 1, UrlHandler.HH_RESUME.name(), null));
+        dao.createDownloadableLink(new DownloadableLink("hhResumeHandlerTest", 1, UrlTypes.HH_RESUME, null));
         doReturn(JSON).when(seleniumBrowser).execJs(anyString());
         processor.processLinks();
         verify(seleniumBrowser, times(1)).execJs(anyString());
@@ -89,7 +89,7 @@ public class LinkProcessorIT {
 
     @Test
     public void hhVacancyHandlerTest() {
-        dao.createDownloadableLink(new DownloadableLink("hhVacancyHandlerTest", 1, UrlHandler.HH_VACANCY.name(), null));
+        dao.createDownloadableLink(new DownloadableLink("hhVacancyHandlerTest", 1, UrlTypes.HH_VACANCY, null));
         Downloader.DownloaderResult result = mock(Downloader.DownloaderResult.class);
         doReturn(result).when(downloader).download(eq("hhVacancyHandlerTest"), anyObject(), anyInt());
         doReturn(200).when(result).getResponseCode();
@@ -101,7 +101,7 @@ public class LinkProcessorIT {
 
     @Test
     public void hhVacancyHandlerEmptyTest() {
-        dao.createDownloadableLink(new DownloadableLink("hhVacancyHandlerEmptyTest", 1, UrlHandler.HH_VACANCY.name(), null));
+        dao.createDownloadableLink(new DownloadableLink("hhVacancyHandlerEmptyTest", 1, UrlTypes.HH_VACANCY, null));
         Downloader.DownloaderResult result = mock(Downloader.DownloaderResult.class);
         doReturn(result).when(downloader).download(eq("hhVacancyHandlerEmptyTest"), anyObject(), anyInt());
         doReturn(501).when(result).getResponseCode();
@@ -119,7 +119,7 @@ public class LinkProcessorIT {
 
     @Test
     public void hhListVacanciesHandlerTest() {
-        dao.createDownloadableLink(new DownloadableLink("hhListVacanciesHandlerTest", 1, UrlHandler.HH_LIST_VACANCIES.name(), null));
+        dao.createDownloadableLink(new DownloadableLink("hhListVacanciesHandlerTest", 1, UrlTypes.HH_LIST_VACANCIES, null));
         Downloader.DownloaderResult result = mock(Downloader.DownloaderResult.class);
         doReturn(result).when(downloader).download(eq("hhListVacanciesHandlerTest"), anyObject(), anyInt());
         doReturn(200).when(result).getResponseCode();
@@ -159,7 +159,7 @@ public class LinkProcessorIT {
 
     @Test
     public void hhListVacanciesHandlerEmptyTest() {
-        dao.createDownloadableLink(new DownloadableLink("hhListVacanciesHandlerEmptyTest", 1, UrlHandler.HH_LIST_VACANCIES.name(), null));
+        dao.createDownloadableLink(new DownloadableLink("hhListVacanciesHandlerEmptyTest", 1, UrlTypes.HH_LIST_VACANCIES, null));
         Downloader.DownloaderResult result = mock(Downloader.DownloaderResult.class);
         doReturn(result).when(downloader).download(eq("hhListVacanciesHandlerEmptyTest"), anyObject(), anyInt());
         doReturn(505).when(result).getResponseCode();
@@ -188,7 +188,7 @@ public class LinkProcessorIT {
         doReturn(list).when(seleniumBrowser).execJs(eq(jsScript.getResumeList()));
         doReturn(JSON).when(seleniumBrowser).execJs(eq(jsScript.getResume()));
 
-        dao.createDownloadableLink(new DownloadableLink("hhListResumeHandlerTest", 1, UrlHandler.HH_LIST_RESUME.name(), null));
+        dao.createDownloadableLink(new DownloadableLink("hhListResumeHandlerTest", 1, UrlTypes.HH_LIST_RESUME, null));
         processor.processLinks();
 
         verify(rawDataStorageDao, times(1)).saveHhResume(anyObject(),

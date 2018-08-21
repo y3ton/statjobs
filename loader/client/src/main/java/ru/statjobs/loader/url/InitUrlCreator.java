@@ -3,7 +3,7 @@ package ru.statjobs.loader.url;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.HhDictionary;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class InitUrlCreator {
                                 ind,
                                 0,
                                 perPage);
-                        links.add(new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_VACANCIES.name(), null));
+                        links.add(new DownloadableLink(url, sequenceNum, UrlTypes.HH_LIST_VACANCIES, null));
                     }
                 }
             }
@@ -76,7 +76,7 @@ public class InitUrlCreator {
                         city,
                         0,
                         perPage);
-                links.add(new DownloadableLink(url, sequenceNum, UrlHandler.HH_LIST_RESUME.name(), null));
+                links.add(new DownloadableLink(url, sequenceNum, UrlTypes.HH_LIST_RESUME, null));
             }
         }
         return links;

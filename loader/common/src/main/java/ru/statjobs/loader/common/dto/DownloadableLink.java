@@ -1,18 +1,22 @@
 package ru.statjobs.loader.common.dto;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import ru.statjobs.loader.common.url.UrlTypes;
 
 import java.io.Serializable;
 import java.util.Map;
 
 public class DownloadableLink implements Serializable {
 
-    private final String url;
-    private final Integer sequenceNum;
-    private final String handlerName;
-    private final Map<String, String> props;
+    private String url;
+    private Integer sequenceNum;
+    private UrlTypes handlerName;
+    private Map<String, String> props;
 
-    public DownloadableLink(String url, Integer sequenceNum, String handlerName, Map<String, String> props) {
+    public DownloadableLink() {
+    }
+
+    public DownloadableLink(String url, Integer sequenceNum, UrlTypes handlerName, Map<String, String> props) {
         this.url = url;
         this.sequenceNum = sequenceNum;
         this.handlerName = handlerName;
@@ -23,16 +27,32 @@ public class DownloadableLink implements Serializable {
         return url;
     }
 
-    public String getHandlerName() {
-        return handlerName;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public Integer getSequenceNum() {
         return sequenceNum;
     }
 
+    public void setSequenceNum(Integer sequenceNum) {
+        this.sequenceNum = sequenceNum;
+    }
+
+    public UrlTypes getHandlerName() {
+        return handlerName;
+    }
+
+    public void setHandlerName(UrlTypes handlerName) {
+        this.handlerName = handlerName;
+    }
+
     public Map<String, String> getProps() {
         return props;
+    }
+
+    public void setProps(Map<String, String> props) {
+        this.props = props;
     }
 
     @Override

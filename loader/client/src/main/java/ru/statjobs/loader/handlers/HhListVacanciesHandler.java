@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.url.UrlConstructor;
 import ru.statjobs.loader.utils.Downloader;
 import ru.statjobs.loader.utils.JsonUtils;
@@ -54,13 +54,13 @@ public class HhListVacanciesHandler implements  LinkHandler {
             items.stream()
                     .map(item -> (String) item.get("url"))
                     .filter(StringUtils::isNotBlank)
-                    .map(urlVacancy -> new DownloadableLink(urlVacancy, link.getSequenceNum(), UrlHandler.HH_VACANCY.name(), null))
+                    .map(urlVacancy -> new DownloadableLink(urlVacancy, link.getSequenceNum(), UrlTypes.HH_VACANCY, null))
                     .forEach(downloadableLinkDao::createDownloadableLink);
 
             DownloadableLink nextLink = new DownloadableLink(
                     urlConstructor.hhUrlNextPage(link.getUrl()),
                     link.getSequenceNum(),
-                    UrlHandler.HH_LIST_VACANCIES.name(),
+                    UrlTypes.HH_LIST_VACANCIES,
                     null
             );
             downloadableLinkDao.createDownloadableLink(nextLink);

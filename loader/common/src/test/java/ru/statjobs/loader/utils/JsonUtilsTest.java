@@ -2,6 +2,9 @@ package ru.statjobs.loader.utils;
 
 import org.junit.Assert;
 import org.junit.Test;
+import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.dto.RawData;
+import ru.statjobs.loader.common.url.UrlTypes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +49,30 @@ public class JsonUtilsTest {
         Assert.assertEquals("{}", jsonUtils.createString(map));
         map.put("a", "b");
         Assert.assertEquals("{\"a\":\"b\"}", jsonUtils.createString(map));
+    }
+
+    @Test
+    public void createStringFromObjectTest() {
+        Map<String, String> prop = new HashMap();
+        prop.put("c12", "cv12");
+        prop.put("d12", "dv12");
+        RawData rawData = new RawData(
+                new DownloadableLink("url12", 123456, UrlTypes.HH_LIST_RESUME, prop),
+                "{\"a12\":\"av12\", \"b12\":\"bv12\"}"
+        );
+        String str = jsonUtils.createString(rawData);
+        Assert.assertTrue(str.contains("url12"));
+        Assert.assertTrue(str.contains("123456"));
+        Assert.assertTrue(str.contains("HH_LIST_RESUME"));
+        Assert.assertTrue(str.contains("c12"));
+        Assert.assertTrue(str.contains("cv12"));
+        Assert.assertTrue(str.contains("d12"));
+        Assert.assertTrue(str.contains("dv12"));
+
+        Assert.assertTrue(str.contains("a12"));
+        Assert.assertTrue(str.contains("av12"));
+        Assert.assertTrue(str.contains("b12"));
+        Assert.assertTrue(str.contains("bv12"));
     }
 
     @Test(expected = RuntimeException.class)

@@ -4,6 +4,7 @@ package ru.statjobs.loader.dao;
 import org.javatuples.Pair;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.*;
@@ -37,7 +38,7 @@ public class DownloadableLinkDaoPostgresImpl implements DownloadableLinkDao {
             query = query.replace("?::JSON", "?");
         }
         try (PreparedStatement preparedStatement = connection.prepareStatement (query)) {
-            preparedStatement.setString(1, link.getHandlerName());
+            preparedStatement.setString(1, link.getHandlerName().name());
             preparedStatement.setString(2, link.getUrl());
             preparedStatement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
             preparedStatement.setInt(4, link.getSequenceNum());
@@ -124,7 +125,7 @@ public class DownloadableLinkDaoPostgresImpl implements DownloadableLinkDao {
             DownloadableLink downloadableLink = new DownloadableLink(
                     resultSet.getString("URL"),
                     resultSet.getInt("SEQUENCE_NUM"),
-                    resultSet.getString("HANDLER_NAME"),
+                    UrlTypes.valueOf(resultSet.getString("HANDLER_NAME")),
                     jsonUtils.readString(resultSet.getString("PROPS"))
             );
             return new Pair<>(id, downloadableLink);

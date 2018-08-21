@@ -8,6 +8,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.url.UrlTypes;
+import ru.statjobs.loader.utils.JsonUtils;
 
 import javax.jms.*;
 import java.util.HashMap;
@@ -19,6 +21,7 @@ public class RawDataStorageDaoJmsImplIT {
 
     private final static String JSON = "{\"aa123\":\"aa321\"}";
     private final static String QUEUE_NAME = "tq";
+    private final static JsonUtils jsonUtils = new JsonUtils();
 
     @BeforeClass
     public static void start() throws Exception {
@@ -37,12 +40,12 @@ public class RawDataStorageDaoJmsImplIT {
     @Test
     public void saveHhVacancySimpleTest() throws InterruptedException, JMSException {
         //
-        RawDataStorageDao rawDataStorageDao = new RawDataStorageDaoJmsImpl(factory,QUEUE_NAME);
+        RawDataStorageDao rawDataStorageDao = new RawDataStorageDaoJmsImpl(factory, QUEUE_NAME, jsonUtils);
         rawDataStorageDao.saveHhVacancy(
                 new DownloadableLink(
                         "url1",
                         123,
-                        "handler1",
+                        UrlTypes.HH_RESUME,
                         new HashMap<String, String>() {{
                             put("props1", "props11");
                             put("props2", "props22");
@@ -62,7 +65,7 @@ public class RawDataStorageDaoJmsImplIT {
 
         Assert.assertTrue(msg.contains("\"url\":\"url1\""));
         Assert.assertTrue(msg.contains("\"sequenceNum\":123"));
-        Assert.assertTrue(msg.contains("\"handlerName\":\"handler1\""));
+        Assert.assertTrue(msg.contains("\"handlerName\":\"HH_RESUME\""));
         Assert.assertTrue(msg.contains("\"props1\":\"props11\""));
         Assert.assertTrue(msg.contains("\"props2\":\"props22\""));
         Assert.assertTrue(msg.contains("aa123"));
@@ -77,9 +80,9 @@ public class RawDataStorageDaoJmsImplIT {
 
     @Test
     public void failConnection() {
-        RawDataStorageDao rawDataStorageDao = new RawDataStorageDaoJmsImpl(new ActiveMQConnectionFactory("localhost123"), QUEUE_NAME);
+        RawDataStorageDao rawDataStorageDao = new RawDataStorageDaoJmsImpl(new ActiveMQConnectionFactory("localhost123"), QUEUE_NAME, jsonUtils);
         try {
-            rawDataStorageDao.saveHhVacancy(new DownloadableLink("", 0, "", null), "");
+            rawDataStorageDao.saveHhVacancy(new DownloadableLink("", 0, UrlTypes.HH_RESUME, null), "");
         } catch (Exception e) {
             return;
         }
@@ -88,15 +91,15 @@ public class RawDataStorageDaoJmsImplIT {
 
     @Test
     public void failConnectionInProcess() throws Exception {
-        RawDataStorageDao rawDataStorageDao = new RawDataStorageDaoJmsImpl(factory, QUEUE_NAME);
-        rawDataStorageDao.saveHhVacancy(new DownloadableLink("1", 0, "1", null), JSON);
-        rawDataStorageDao.saveHhVacancy(new DownloadableLink("1", 0, "1", null), JSON);
+        RawDataStorageDao rawDataStorageDao = new RawDataStorageDaoJmsImpl(factory, QUEUE_NAME, jsonUtils);
+        rawDataStorageDao.saveHhVacancy(new DownloadableLink("1", 0, UrlTypes.HH_RESUME, null), JSON);
+        rawDataStorageDao.saveHhVacancy(new DownloadableLink("1", 0, UrlTypes.HH_RESUME, null), JSON);
         broker.stop();
         broker.waitUntilStopped();
         broker.start();
         broker.waitUntilStarted();
 
-        rawDataStorageDao.saveHhVacancy(new DownloadableLink("failConnectionInProcess", 0, "1", null), JSON);
+        rawDataStorageDao.saveHhVacancy(new DownloadableLink("failConnectionInProcess", 0, UrlTypes.HH_RESUME, null), JSON);
 
         Connection connection = factory.createConnection();
         connection.start();

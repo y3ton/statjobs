@@ -4,7 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.*;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.url.UrlConstructor;
@@ -61,7 +61,7 @@ public class HhListVacanciesHandlerIT {
     public void hhListVacanciesHandlerComplexTest() {
         HhListVacanciesHandler handler = new HhListVacanciesHandler(downloader, jsonUtils, dao, urlConstructor);
 
-        DownloadableLink link = new DownloadableLink("http://localhost:8080/json1", 1, UrlHandler.HH_LIST_VACANCIES.name(), null);
+        DownloadableLink link = new DownloadableLink("http://localhost:8080/json1", 1, UrlTypes.HH_LIST_VACANCIES, null);
         dao.createDownloadableLink(link);
         Assert.assertNotNull(dao.getDownloadableLink());
 
@@ -76,9 +76,9 @@ public class HhListVacanciesHandlerIT {
         Map<String, DownloadableLink> map = IntStream.rangeClosed(0, 2)
                 .mapToObj(i -> dao.getDownloadableLink())
                 .collect(Collectors.toMap(DownloadableLink::getUrl, x -> x));
-        Assert.assertEquals(UrlHandler.HH_VACANCY.name(), map.get("url1").getHandlerName());
-        Assert.assertEquals(UrlHandler.HH_VACANCY.name(), map.get("url2").getHandlerName());
-        Assert.assertEquals(UrlHandler.HH_LIST_VACANCIES.name(), map.get("http://localhost:8080/json1&page=1").getHandlerName());
+        Assert.assertEquals(UrlTypes.HH_VACANCY, map.get("url1").getHandlerName());
+        Assert.assertEquals(UrlTypes.HH_VACANCY, map.get("url2").getHandlerName());
+        Assert.assertEquals(UrlTypes.HH_LIST_VACANCIES, map.get("http://localhost:8080/json1&page=1").getHandlerName());
         Assert.assertNull(dao.getDownloadableLink());
     }
 
@@ -86,7 +86,7 @@ public class HhListVacanciesHandlerIT {
     public void hhListVacanciesHandlerDownloadEmptyResultTest() {
         HhListVacanciesHandler handler = new HhListVacanciesHandler(downloader, jsonUtils, dao, urlConstructor);
 
-        DownloadableLink link = new DownloadableLink("http://localhost:8080/json1", 1, UrlHandler.HH_LIST_VACANCIES.name(), null);
+        DownloadableLink link = new DownloadableLink("http://localhost:8080/json1", 1, UrlTypes.HH_LIST_VACANCIES, null);
         dao.createDownloadableLink(link);
         Assert.assertNotNull(dao.getDownloadableLink());
 

@@ -2,6 +2,7 @@ package ru.statjobs.loader.dao;
 
 import org.junit.*;
 import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.testutils.H2Utils;
 
 import java.sql.*;
@@ -36,7 +37,7 @@ public class RawDataStorageDaoPostgresImplIT {
     public void getDownloadableLinkTest() throws SQLException {
         String json = "{\"a\":\"b\"}";
         long startTime = System.currentTimeMillis();
-        dao.saveHhVacancy(new DownloadableLink("url1", 1, "HANDLER", null), json);
+        dao.saveHhVacancy(new DownloadableLink("url1", 1, UrlTypes.HH_RESUME, null), json);
         long endTime = System.currentTimeMillis();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from T_HH_RAW_VACANCIES");

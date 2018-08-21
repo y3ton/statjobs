@@ -7,7 +7,7 @@ import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.url.UrlConstructor;
 
 import java.text.DateFormat;
@@ -59,7 +59,7 @@ public class HhListResumeHandler implements  LinkHandler  {
                     return new DownloadableLink(
                             list2.get(0),
                             link.getSequenceNum(),
-                            UrlHandler.HH_RESUME.name(),
+                            UrlTypes.HH_RESUME,
                             props);
                 })
                 .forEach(downloadableLinkDao::createDownloadableLink);
@@ -70,7 +70,7 @@ public class HhListResumeHandler implements  LinkHandler  {
                         new DownloadableLink(
                             urlConstructor.hhUrlNextPage(link.getUrl()),
                             link.getSequenceNum(),
-                            UrlHandler.HH_LIST_RESUME.name(),
+                            UrlTypes.HH_LIST_RESUME,
                             null
                         )
             );

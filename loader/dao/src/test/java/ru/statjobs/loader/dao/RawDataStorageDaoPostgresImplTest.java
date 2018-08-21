@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.url.UrlTypes;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,7 +25,7 @@ public class RawDataStorageDaoPostgresImplTest {
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 
         RawDataStorageDao dao = new RawDataStorageDaoPostgresImpl(connection);
-        DownloadableLink link = new DownloadableLink("url", 177, "handler", null);
+        DownloadableLink link = new DownloadableLink("url", 177, UrlTypes.HH_RESUME, null);
 
         dao.saveHhVacancy(link, "json_1" );
         verify(preparedStatement, Mockito.times(1)).setString( 1, "url");

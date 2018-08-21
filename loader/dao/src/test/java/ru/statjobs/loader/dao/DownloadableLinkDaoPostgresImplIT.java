@@ -2,7 +2,7 @@ package ru.statjobs.loader.dao;
 
 import org.junit.*;
 import ru.statjobs.loader.common.dto.DownloadableLink;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.utils.JsonUtils;
 
@@ -46,11 +46,11 @@ public class DownloadableLinkDaoPostgresImplIT {
         Map<String, String> props = new HashMap();
         props.put("prop1", "1");
         props.put("prop2", "2");
-        Assert.assertTrue(dao.createDownloadableLink(new DownloadableLink("url1", 1, "HANDLER", props)));
+        Assert.assertTrue(dao.createDownloadableLink(new DownloadableLink("url1", 1, UrlTypes.HH_VACANCY, props)));
         DownloadableLink link1 = dao.getDownloadableLink();
         Assert.assertEquals("url1", link1.getUrl());
         Assert.assertEquals(Integer.valueOf(1), link1.getSequenceNum());
-        Assert.assertEquals("HANDLER", link1.getHandlerName());
+        Assert.assertEquals(UrlTypes.HH_VACANCY, link1.getHandlerName());
         Map<String, String> propsResult = link1.getProps();
         Assert.assertEquals(2, propsResult.size());
         Assert.assertEquals ("1", propsResult.get("prop1"));
@@ -60,9 +60,9 @@ public class DownloadableLinkDaoPostgresImplIT {
     @Test
     public void getDownloadableLinkTest() throws SQLException, FileNotFoundException {
         Assert.assertNull(dao.getDownloadableLink());
-        Assert.assertTrue(dao.createDownloadableLink(new DownloadableLink("url1", 1, UrlHandler.HH_VACANCY.name(), Collections.EMPTY_MAP)));
-        Assert.assertTrue(dao.createDownloadableLink(new DownloadableLink("url2", 1, UrlHandler.HH_VACANCY.name(), null)));
-        Assert.assertTrue(dao.createDownloadableLink(new DownloadableLink("url3", 1, UrlHandler.HH_VACANCY.name(), null)));
+        Assert.assertTrue(dao.createDownloadableLink(new DownloadableLink("url1", 1, UrlTypes.HH_VACANCY, Collections.EMPTY_MAP)));
+        Assert.assertTrue(dao.createDownloadableLink(new DownloadableLink("url2", 1, UrlTypes.HH_VACANCY, null)));
+        Assert.assertTrue(dao.createDownloadableLink(new DownloadableLink("url3", 1, UrlTypes.HH_VACANCY, null)));
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select count(*) from T_QUEUE_DOWNLOADABLE_LINK where DATE_PROCESS is null");
         Assert.assertTrue(resultSet.next());
@@ -89,15 +89,15 @@ public class DownloadableLinkDaoPostgresImplIT {
         props.put("prop1", "1");
         props.put("prop2", "2");
         Assert.assertTrue(
-                dao.createDownloadableLink(new DownloadableLink("url", 17, UrlHandler.HH_VACANCY.name(), props)));
+                dao.createDownloadableLink(new DownloadableLink("url", 17, UrlTypes.HH_VACANCY, props)));
         // duplicate check isContainsDownloadableLink
         Assert.assertFalse(
-                dao.createDownloadableLink(new DownloadableLink("url", 17, UrlHandler.HH_VACANCY.name(), props)));
+                dao.createDownloadableLink(new DownloadableLink("url", 17, UrlTypes.HH_VACANCY, props)));
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from T_QUEUE_DOWNLOADABLE_LINK");
         Assert.assertTrue(resultSet.next());
         //HANDLER_NAME, URL, DATE_CREATE, SEQUENCE_NUM, IS_DELETE
-        Assert.assertEquals(UrlHandler.HH_VACANCY.name(), resultSet.getString("HANDLER_NAME"));
+        Assert.assertEquals(UrlTypes.HH_VACANCY.name(), resultSet.getString("HANDLER_NAME"));
         Assert.assertEquals("url", resultSet.getString("URL"));
         Assert.assertEquals(17, resultSet.getInt("SEQUENCE_NUM"));
         Assert.assertNotNull(resultSet.getTimestamp("DATE_CREATE"));
@@ -116,7 +116,7 @@ public class DownloadableLinkDaoPostgresImplIT {
 
     @Test
     public void deleteDownloadableLinkTest() throws SQLException, FileNotFoundException {
-        DownloadableLink link = new DownloadableLink("url", 1, UrlHandler.HH_VACANCY.name(), null);
+        DownloadableLink link = new DownloadableLink("url", 1, UrlTypes.HH_VACANCY, null);
         // get empty - null
         Assert.assertNull(dao.getDownloadableLink());
         Assert.assertFalse(dao.deleteDownloadableLink(link));

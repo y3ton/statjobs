@@ -6,7 +6,7 @@ import org.junit.Test;
 import ru.statjobs.loader.Const;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.HhDictionary;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.dao.HhDictionaryDaoImpl;
 import ru.statjobs.loader.utils.FileUtils;
 import ru.statjobs.loader.utils.JsonUtils;
@@ -38,7 +38,7 @@ public class InitHhItResumeLinkTest {
         Assert.assertEquals(1, list.size());
         DownloadableLink link = list.get(0);
         Assert.assertEquals((Integer) 170, link.getSequenceNum());
-        Assert.assertEquals(UrlHandler.HH_LIST_RESUME.name(), link.getHandlerName());
+        Assert.assertEquals(UrlTypes.HH_LIST_RESUME, link.getHandlerName());
         Assert.assertEquals(
                 "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true&specialization=specCode&search_period=30&area=msk&items_on_page=100",
                 link.getUrl()
@@ -55,7 +55,7 @@ public class InitHhItResumeLinkTest {
         Assert.assertEquals(4, list.size());
         DownloadableLink link = list.get(0);
         Assert.assertEquals((Integer) 170, link.getSequenceNum());
-        Assert.assertEquals(UrlHandler.HH_LIST_RESUME.name(), link.getHandlerName());
+        Assert.assertEquals(UrlTypes.HH_LIST_RESUME, link.getHandlerName());
         Assert.assertEquals(
                 "https://hh.ru/search/resume?exp_period=all_time&order_by=publication_time&text=&pos=full_text&logic=normal&clusters=true&specialization=specCode&search_period=30&area=msk&items_on_page=100",
                 link.getUrl()
@@ -82,7 +82,7 @@ public class InitHhItResumeLinkTest {
         List<DownloadableLink> list = initUrlCreator.initHhItResumeLink(urlConstructor, 170, 100, cities, specialization, 30);
         DownloadableLink link = list.get(0);
         Assert.assertEquals((Integer) 170, link.getSequenceNum());
-        Assert.assertEquals(UrlHandler.HH_LIST_RESUME.name(), link.getHandlerName());
+        Assert.assertEquals(UrlTypes.HH_LIST_RESUME, link.getHandlerName());
         Assert.assertTrue(specialization.size() > 150);
         Assert.assertTrue(list.size() < 100);
     }

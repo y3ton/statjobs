@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.handlers.*;
 import ru.statjobs.loader.url.UrlConstructor;
 import ru.statjobs.loader.utils.Downloader;
@@ -48,28 +48,28 @@ public class LinkProcessor {
     }
 
     public void processLinks() {
-        Map<UrlHandler, LinkHandler> mapHandler = createUrlHandlerLocator();
+        Map<UrlTypes, LinkHandler> mapHandler = createUrlHandlerLocator();
         DownloadableLink link;
         while ((link = downloadableLinkDao.getDownloadableLink()) != null) {
             LOGGER.info("process url: {}", link.getUrl());
-            mapHandler.get(UrlHandler.valueOf(link.getHandlerName()))
+            mapHandler.get(link.getHandlerName())
                     .process(link);
         }
     }
 
-    private Map<UrlHandler, LinkHandler> createUrlHandlerLocator() {
+    private Map<UrlTypes, LinkHandler> createUrlHandlerLocator() {
         return Collections.unmodifiableMap(Stream.of(
                 new AbstractMap.SimpleEntry<>(
-                        UrlHandler.HH_RESUME,
+                        UrlTypes.HH_RESUME,
                         new HhResumeHandler(seleniumBrowser, jsScript, rawDataStorageDao, downloadableLinkDao)),
                 new AbstractMap.SimpleEntry<>(
-                        UrlHandler.HH_LIST_RESUME,
+                        UrlTypes.HH_LIST_RESUME,
                         new HhListResumeHandler(seleniumBrowser, jsScript, downloadableLinkDao, urlConstructor)),
                 new AbstractMap.SimpleEntry<>(
-                        UrlHandler.HH_LIST_VACANCIES,
+                        UrlTypes.HH_LIST_VACANCIES,
                         new HhListVacanciesHandler(downloader, jsonUtils, downloadableLinkDao, urlConstructor)),
                 new AbstractMap.SimpleEntry<>(
-                        UrlHandler.HH_VACANCY,
+                        UrlTypes.HH_VACANCY,
                         new HhVacancyHandler(downloader, rawDataStorageDao, downloadableLinkDao)))
                 .collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
     }

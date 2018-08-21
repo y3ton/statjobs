@@ -10,7 +10,7 @@ import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.dao.RawDataStorageDaoPostgresImpl;
 import ru.statjobs.loader.testutils.H2Utils;
@@ -55,7 +55,7 @@ public class HhResumeHandlerIT {
         HhResumeHandler handler = new HhResumeHandler(browser, jsScript, rawDataStorageDao, dao);
 
         dao.createDownloadableLink(
-                new DownloadableLink("url17", 17, UrlHandler.HH_LIST_RESUME.name(),
+                new DownloadableLink("url17", 17, UrlTypes.HH_LIST_RESUME,
                 new HashMap<String, String>() {{
                     put(Const.AREA_CODE, "area1");
                     put(Const.DATE_CREATE_RESUME, "date1");

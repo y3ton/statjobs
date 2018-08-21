@@ -26,6 +26,14 @@ public class JsonUtils {
         }
     }
 
+    public String createString(Object obj) {
+        try {
+            return mapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public <T> T readString(String json) {
         if (StringUtils.isBlank(json)) {
             return (T) Collections.EMPTY_MAP;

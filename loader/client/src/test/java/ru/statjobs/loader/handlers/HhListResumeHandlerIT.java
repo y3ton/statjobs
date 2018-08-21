@@ -6,7 +6,7 @@ import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
-import ru.statjobs.loader.common.url.UrlHandler;
+import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.url.UrlConstructor;
@@ -62,7 +62,7 @@ public class HhListResumeHandlerIT {
         doReturn(listUrls).when(browser).execJs(anyString());
         doReturn(3L).when(browser).execJs(eq("return document.querySelectorAll('[data-qa=\"pager-next\"]').length"));
 
-        dao.createDownloadableLink(new DownloadableLink("url", 1, UrlHandler.HH_LIST_RESUME.name(), null));
+        dao.createDownloadableLink(new DownloadableLink("url", 1, UrlTypes.HH_LIST_RESUME, null));
         DownloadableLink initLink = dao.getDownloadableLink();
 
         handler.process(initLink);
@@ -81,7 +81,7 @@ public class HhListResumeHandlerIT {
                         l.getUrl().equals("url1") && l.getProps().get(Const.DATE_CREATE_RESUME).endsWith("-09-10 11:11:00") ||
                                 l.getUrl().equals("url2") && l.getProps().get(Const.DATE_CREATE_RESUME).endsWith("-01-10 00:00:00") ||
                                 l.getUrl().equals("url3") && l.getProps().get(Const.DATE_CREATE_RESUME).endsWith("-12-10 13:59:00") ||
-                                l.getUrl().equals("url&page=1") && l.getHandlerName().equals(UrlHandler.HH_LIST_RESUME.name())
+                                l.getUrl().equals("url&page=1") && l.getHandlerName().equals(UrlTypes.HH_LIST_RESUME)
                 ))
                 .collect(Collectors.toList());
         Assert.assertTrue(list.isEmpty());
@@ -97,7 +97,7 @@ public class HhListResumeHandlerIT {
         doReturn(listUrls).when(browser).execJs(anyString());
         doReturn(0L).when(browser).execJs(eq("return document.querySelectorAll('[data-qa=\"pager-next\"]').length"));
 
-        handler.process(new DownloadableLink("url", 1, UrlHandler.HH_LIST_RESUME.name(), null));
+        handler.process(new DownloadableLink("url", 1, UrlTypes.HH_LIST_RESUME, null));
         verify(browser, times(1)).get("url");
         verify(browser, times(1)).start();
         verify(dao, times(1)).deleteDownloadableLink(anyObject());

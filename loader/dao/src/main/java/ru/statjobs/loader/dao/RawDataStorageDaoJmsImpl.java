@@ -3,12 +3,12 @@ package ru.statjobs.loader.dao;
 import javax.jms.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.RawData;
+import ru.statjobs.loader.utils.JsonUtils;
 
 public class RawDataStorageDaoJmsImpl implements RawDataStorageDao {
 
@@ -17,17 +17,19 @@ public class RawDataStorageDaoJmsImpl implements RawDataStorageDao {
 
     private final ConnectionFactory connectionFactory;
     private final String queueName;
+    private final JsonUtils jsonUtils;
 
-    ObjectMapper mapper = new ObjectMapper();
+
 
     private Connection connection = null;
     private Session session = null;
     private Queue queue = null;
     private MessageProducer producer = null;
 
-    public RawDataStorageDaoJmsImpl(ConnectionFactory connectionFactory, String queueName) {
+    public RawDataStorageDaoJmsImpl(ConnectionFactory connectionFactory, String queueName, JsonUtils jsonUtils) {
         this.connectionFactory = connectionFactory;
         this.queueName = queueName;
+        this.jsonUtils = jsonUtils;
     }
 
     @Override
@@ -125,7 +127,7 @@ public class RawDataStorageDaoJmsImpl implements RawDataStorageDao {
 
     private void send(DownloadableLink link, String json) throws JMSException, JsonProcessingException {
         RawData rawData = new RawData(link, json);
-        TextMessage message = session.createTextMessage(mapper.writeValueAsString(rawData));
+        TextMessage message = session.createTextMessage(jsonUtils.createString(rawData));
         producer.send(message);
     }
 }
