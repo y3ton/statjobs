@@ -40,6 +40,12 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
+        <!--amazon-->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>amazon-sqs-java-messaging-lib</artifactId>
+        </dependency>
+
 
         <!--camel-->
         <dependency>
@@ -117,6 +123,8 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
+                            <finalName>loadsrv</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
                             <archive>
                                 <manifest>
                                     <mainClass>ru.statjobs.loader.loadsrv.App</mainClass>

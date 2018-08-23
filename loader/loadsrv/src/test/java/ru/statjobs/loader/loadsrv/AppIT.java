@@ -17,7 +17,6 @@ import ru.statjobs.loader.utils.JsonUtils;
 
 import static org.mockito.Mockito.*;
 
-
 public class AppIT {
 
     static BrokerService broker = new BrokerService();
@@ -56,13 +55,13 @@ public class AppIT {
 
         RawDataStorageDaoProxy postgresDao = mock(RawDataStorageDaoProxy.class);
         jndiContext.bind("postgresDao", postgresDao);
-        camelContext.addComponent("mq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
-        new App().createRoute(camelContext, App.RAW_QUEUE_NAME);
+        camelContext.addComponent("jms", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
+        new App().createRoute(camelContext);
         camelContext.start();
 
         ProducerTemplate template = camelContext.createProducerTemplate();
-        template.sendBody("mq:queue:" + App.RAW_QUEUE_NAME, "{\"link\":{\"url\":\"url123\",\"sequenceNum\":1,\"handlerName\":\"HH_RESUME\",\"props\":null},\"json\":\"{}\"}");
-        template.sendBody("mq:queue:" + App.RAW_QUEUE_NAME, "{\"link\":{\"url\":\"url123\",\"sequenceNum\":1,\"handlerName\":\"HH_RESUME\",\"props\":null},\"json\":\"{}\"}");
+        template.sendBody("jms:" + App.RAW_QUEUE_NAME, "{\"link\":{\"url\":\"url123\",\"sequenceNum\":1,\"handlerName\":\"HH_RESUME\",\"props\":null},\"json\":\"{}\"}");
+        template.sendBody("jms:" + App.RAW_QUEUE_NAME, "{\"link\":{\"url\":\"url123\",\"sequenceNum\":1,\"handlerName\":\"HH_RESUME\",\"props\":null},\"json\":\"{}\"}");
 
         Thread.sleep(100);
         verify(postgresDao, times(2)).save(anyObject());
@@ -73,15 +72,15 @@ public class AppIT {
         RawDataStorageDao postgresMock = mock(RawDataStorageDao.class);
         RawDataStorageDaoProxy proxy = spy(new RawDataStorageDaoProxy(postgresMock));
         jndiContext.bind("postgresDao", proxy);
-        camelContext.addComponent("mq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
-        new App().createRoute(camelContext, App.RAW_QUEUE_NAME);
+        camelContext.addComponent("jms", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
+        new App().createRoute(camelContext);
         camelContext.start();
 
         ProducerTemplate template = camelContext.createProducerTemplate();
 
         ListAppender.clear();
 
-        template.sendBody("mq:queue:" + App.RAW_QUEUE_NAME, "{\"link\":{\"url\":\"url123\",\"sequenceNum\":1,\"handlerName\":\"HH_LIST_RESUME\",\"props\":null},\"json\":\"{}\"}");
+        template.sendBody("jms:" + App.RAW_QUEUE_NAME, "{\"link\":{\"url\":\"url123\",\"sequenceNum\":1,\"handlerName\":\"HH_LIST_RESUME\",\"props\":null},\"json\":\"{}\"}");
 
         Thread.sleep(100);
         verify(postgresMock, times(0)).saveHhResume(anyObject(), anyString());
@@ -96,8 +95,8 @@ public class AppIT {
         RawDataStorageDao postgresMock = mock(RawDataStorageDao.class);
         RawDataStorageDaoProxy proxy = spy(new RawDataStorageDaoProxy(postgresMock));
         jndiContext.bind("postgresDao", proxy);
-        camelContext.addComponent("mq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
-        new App().createRoute(camelContext, App.RAW_QUEUE_NAME);
+        camelContext.addComponent("jms", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
+        new App().createRoute(camelContext);
         camelContext.start();
 
         ProducerTemplate template = camelContext.createProducerTemplate();
@@ -106,7 +105,7 @@ public class AppIT {
 
         String invalidJson =  "{\"link\":{\"url\":\"url123\",\"sequenceNum\":1,\"handlerName\":\"sdfgsdfgsdfgdsfgsdfg\",\"props\":null},\"json\":\"{}\"}";
 
-        template.sendBody("mq:queue:" + App.RAW_QUEUE_NAME, invalidJson);
+        template.sendBody("jms:" + App.RAW_QUEUE_NAME, invalidJson);
 
         Thread.sleep(100);
         verify(postgresMock, times(0)).saveHhResume(anyObject(), anyString());
@@ -130,8 +129,8 @@ public class AppIT {
         RawDataStorageDao postgresMock = mock(RawDataStorageDao.class);
         RawDataStorageDaoProxy proxy = spy(new RawDataStorageDaoProxy(postgresMock));
         jndiContext.bind("postgresDao", proxy);
-        camelContext.addComponent("mq", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
-        new App().createRoute(camelContext, App.RAW_QUEUE_NAME);
+        camelContext.addComponent("jms", ActiveMQComponent.activeMQComponent("vm://localhost?broker.persistent=false"));
+        new App().createRoute(camelContext);
         camelContext.start();
 
         daoJms.saveHhResume(new DownloadableLink("url1", 0, UrlTypes.HH_RESUME, null), "{\"a1\":\"1\"}");

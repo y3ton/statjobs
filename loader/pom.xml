@@ -65,6 +65,14 @@
             </dependency>
 
 
+            <!--amazon-->
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>amazon-sqs-java-messaging-lib</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+
+
             <!--camel-->
 
             <dependency>
@@ -85,6 +93,11 @@
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-jackson</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-aws</artifactId>
                 <version>${camel.version}</version>
             </dependency>
             <dependency>
