@@ -38,7 +38,7 @@ public class App {
             props = propertiesUtils.loadPropertiesFromFile(args[0]);
             LOGGER.info("Properties file name: {}", args[0]);
         } else {
-            props = propertiesUtils.loadPropertiesFromFile(PROPERTIES_FILE);
+            props = propertiesUtils.loadProperties(PROPERTIES_FILE);
             LOGGER.info("Properties file name do not set. Default properties is loaded");
         }
         JndiContext jndiContext = null;
@@ -75,7 +75,10 @@ public class App {
             new App().createRoute(camelContext);
             camelContext.start();
 
-            System.in.read();
+            while (true) {
+                // todo
+                Thread.sleep(1000);
+            }
         } catch(Exception ex) {
             LOGGER.error("fail start app", ex);
         } finally {
