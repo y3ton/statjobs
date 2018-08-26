@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.Scanner;
 
 
 public class App {
@@ -75,9 +76,14 @@ public class App {
             new App().createRoute(camelContext);
             camelContext.start();
 
+            /* wait pres q */
+            Scanner sc = new Scanner(System.in);
             while (true) {
-                // todo
-                Thread.sleep(1000);
+                if (sc.hasNext()) {
+                    if (sc.next().toLowerCase().contains("q")) {
+                        break;
+                    }
+                }
             }
         } catch(Exception ex) {
             LOGGER.error("fail start app", ex);
