@@ -67,7 +67,11 @@ public class SeleniumBrowser {
     public void close() {
         if (isStart) {
             LOGGER.info("close selenium");
-            driver.close();
+            try {
+                driver.close();
+            } catch (Exception e) {
+                LOGGER.error("fail close selenium", e);
+            }
             isStart = false;
         }
     }

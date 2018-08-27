@@ -17,4 +17,6 @@ public class Const {
     public static final int HANDLER_RESTART_TIMEOUT = 15 * 60 *1000;
     public static final int HANDLER_RESTART_ATTEMPT = 10;
 
+    public static final String RAW_QUEUE_NAME = "raw_queue";
+
 }
