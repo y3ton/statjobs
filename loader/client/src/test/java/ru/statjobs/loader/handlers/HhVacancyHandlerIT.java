@@ -28,6 +28,7 @@ public class HhVacancyHandlerIT {
 
     private static Connection connection;
     private static WireMockServer wireMockServer = new WireMockServer();
+    private static JsonUtils jsonUtils = new JsonUtils();
 
     private static DownloadableLinkDao dao;
     private static Downloader downloader;
@@ -53,7 +54,7 @@ public class HhVacancyHandlerIT {
 
     @Test
     public void hhVacancyHandlerComplexTest() throws SQLException {
-        HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
+        HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao, jsonUtils);
         DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlTypes.HH_VACANCY, null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
@@ -84,7 +85,7 @@ public class HhVacancyHandlerIT {
 
     @Test
     public void hhVacancyHandler404Test() throws SQLException {
-        HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
+        HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao, jsonUtils);
         DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlTypes.HH_VACANCY, null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
@@ -109,7 +110,7 @@ public class HhVacancyHandlerIT {
 
     @Test
     public void hhVacancyHandler500Test() throws SQLException {
-        HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao);
+        HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao, jsonUtils);
         DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlTypes.HH_VACANCY, null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());

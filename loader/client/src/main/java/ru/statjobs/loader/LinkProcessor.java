@@ -70,7 +70,7 @@ public class LinkProcessor {
                         new HhListVacanciesHandler(downloader, jsonUtils, downloadableLinkDao, urlConstructor)),
                 new AbstractMap.SimpleEntry<>(
                         UrlTypes.HH_VACANCY,
-                        new HhVacancyHandler(downloader, rawDataStorageDao, downloadableLinkDao)))
+                        new HhVacancyHandler(downloader, rawDataStorageDao, downloadableLinkDao, jsonUtils)))
                 .collect(Collectors.toMap((e) -> e.getKey(), (e) -> e.getValue())));
     }
 

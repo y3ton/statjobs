@@ -19,4 +19,6 @@ public class Const {
 
     public static final String RAW_QUEUE_NAME = "raw_queue";
 
+    public static final int MAX_RAW_JSON_LENGTH = 250000;
+
 }
