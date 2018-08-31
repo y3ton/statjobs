@@ -1,20 +1,22 @@
 package ru.statjobs.loader.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 
 public class RawData implements Serializable{
 
-    private DownloadableLink link;
-    private String json;
+    private final DownloadableLink link;
+    private final String json;
 
-    public RawData(DownloadableLink link, String json) {
+    @JsonCreator
+    public RawData(
+            @JsonProperty("link") DownloadableLink link,
+            @JsonProperty("json") String json) {
         this.link = link;
         this.json = json;
-    }
-
-    public RawData() {
     }
 
     public DownloadableLink getLink() {
@@ -25,13 +27,6 @@ public class RawData implements Serializable{
         return json;
     }
 
-    public void setLink(DownloadableLink link) {
-        this.link = link;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
 
     @Override
     public String toString() {
