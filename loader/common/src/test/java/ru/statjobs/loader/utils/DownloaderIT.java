@@ -1,12 +1,13 @@
 package ru.statjobs.loader.utils;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.junit.*;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -15,49 +16,68 @@ public class DownloaderIT  {
     Downloader downloader = new Downloader();
 
 
-    private static WireMockServer wireMockServer = new WireMockServer();
+    private static Server jettyServer = new Server(8080);
 
-    @BeforeClass
-    public static void start() throws IOException {
-        wireMockServer.start();
-
-    }
-
-    @AfterClass
-    public static void stop() {
-        wireMockServer.stop();
+    @After
+    public void stop() throws Exception {
+        jettyServer.stop();
     }
 
     @Test
-    public void test200() throws InterruptedException {
-        WireMock.stubFor(WireMock.get(WireMock.urlEqualTo("/test200"))
-                .willReturn(WireMock.aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "text/xml")
-                        .withBody("ok!")));
+    public void test200() throws Exception {
+        jettyServer.setHandler(new AbstractHandler() {
+            @Override
+            public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
+                request.setHandled(true);
+                httpServletResponse.setContentType("text/xml");
+                httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+                httpServletResponse.getWriter().print("ok!");
+            }
+        });
+        jettyServer.start();
         Downloader.DownloaderResult result = downloader.download("http://localhost:8080/test200", StandardCharsets.UTF_8, 1000);
         Assert.assertEquals("ok!", result.getText());
         Assert.assertEquals((Integer)200, result.getResponseCode());
     }
 
     @Test
-    public void test404() throws InterruptedException {
+    public void test404() throws Exception {
+        jettyServer.setHandler(new AbstractHandler() {
+            @Override
+            public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
+                request.setHandled(true);
+                httpServletResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+        });
+        jettyServer.start();
         Downloader.DownloaderResult result = downloader.download("http://localhost:8080/test404", StandardCharsets.UTF_8, 1000);
         Assert.assertEquals((Integer)404, result.getResponseCode());
     }
 
-    @Test(expected = java.lang.RuntimeException.class)
-    public void testTimeoutException() throws InterruptedException {
-        WireMock.stubFor(WireMock.get("/delayed").willReturn(
-                WireMock.aResponse()
-                        .withStatus(200)
-                        .withBody("ok!")
-                        .withChunkedDribbleDelay(5, 1000)));
-        downloader.download("http://localhost:8080/delayed", StandardCharsets.UTF_8, 100);
+    @Test()
+    public void testTimeoutException() throws Exception {
+        jettyServer.setHandler(new AbstractHandler() {
+            @Override
+            public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
+                request.setHandled(true);
+                httpServletResponse.setContentType("text/xml");
+                httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+                httpServletResponse.getWriter().println("ok!");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        jettyServer.start();
+        try {
+            downloader.download("http://localhost:8080/delayed", StandardCharsets.UTF_8, 100);
+        } catch (Exception e) {
+            Assert.assertTrue(e.getMessage().toLowerCase().contains("timeout"));
+            return;
+        }
+        Assert.fail();
     }
-
-
-
-
 
 }

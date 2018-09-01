@@ -3,7 +3,7 @@ package ru.statjobs.loader.url;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import ru.statjobs.loader.Const;
+import ru.statjobs.loader.ClientConsts;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.HhDictionary;
 import ru.statjobs.loader.common.url.UrlTypes;
@@ -33,7 +33,7 @@ public class InitHhItResumeLinkTest {
     @Test
     public void createSingleLinkTest() {
         cities.put("msk", "msk");
-        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "specGC", "spec", "specCode"));
+        specialization.add(new HhDictionary(ClientConsts.IT_GROUP_NAME, "specGC", "spec", "specCode"));
         List<DownloadableLink> list = initUrlCreator.initHhItResumeLink(urlConstructor, 170, 100, cities, specialization, 30);
         Assert.assertEquals(1, list.size());
         DownloadableLink link = list.get(0);
@@ -49,8 +49,8 @@ public class InitHhItResumeLinkTest {
     public void createSeveralLinl() {
         cities.put("msk", "msk");
         cities.put("spb", "spb");
-        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "specGC", "spec", "specCode"));
-        specialization.add(new HhDictionary(Const.IT_GROUP_NAME, "2", "2", "2"));
+        specialization.add(new HhDictionary(ClientConsts.IT_GROUP_NAME, "specGC", "spec", "specCode"));
+        specialization.add(new HhDictionary(ClientConsts.IT_GROUP_NAME, "2", "2", "2"));
         List<DownloadableLink> list = initUrlCreator.initHhItResumeLink(urlConstructor, 170, 100, cities, specialization, 30);
         Assert.assertEquals(4, list.size());
         DownloadableLink link = list.get(0);

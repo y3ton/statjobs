@@ -1,6 +1,6 @@
 package ru.statjobs.loader.url;
 
-import ru.statjobs.loader.Const;
+import ru.statjobs.loader.ClientConsts;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.HhDictionary;
 import ru.statjobs.loader.common.url.UrlTypes;
@@ -29,11 +29,11 @@ public class InitUrlCreator {
         for (String city: cities.values()) {
             for (String exp: experience.values()) {
                 for (HhDictionary spec: specialization) {
-                    if (!Const.IT_GROUP_NAME.equals(spec.getGroup())) {
+                    if (!ClientConsts.IT_GROUP_NAME.equals(spec.getGroup())) {
                         continue;
                     }
                     List<String> li;
-                    if (Const.IT_IND_PROGRAMMER.equals(spec.getItem()) || Const.IT_IND_ENGINEER.equals(spec.getItem())) {
+                    if (ClientConsts.IT_IND_PROGRAMMER.equals(spec.getItem()) || ClientConsts.IT_IND_ENGINEER.equals(spec.getItem())) {
                         li = listIndustries;
                     } else {
                         li = new ArrayList<>();
@@ -67,7 +67,7 @@ public class InitUrlCreator {
         List<DownloadableLink> links = new ArrayList<>();
         for (String city: cities.values()) {
             for (HhDictionary spec: specialization) {
-                if (!Const.IT_GROUP_NAME.equals(spec.getGroup())) {
+                if (!ClientConsts.IT_GROUP_NAME.equals(spec.getGroup())) {
                     continue;
                 }
                 String url = urlConstructor.createHhResumeListUrl(

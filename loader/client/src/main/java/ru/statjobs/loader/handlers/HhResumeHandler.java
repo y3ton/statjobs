@@ -3,7 +3,7 @@ package ru.statjobs.loader.handlers;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.statjobs.loader.Const;
+import ru.statjobs.loader.ClientConsts;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
@@ -32,10 +32,10 @@ public class HhResumeHandler implements LinkHandler{
         if (!seleniumBrowser.isStart()) {
             seleniumBrowser.start();
         }
-        String dateCreate = link.getProps().get(Const.DATE_CREATE_RESUME);
-        String dateCreateJson = String.format("\"%s\":\"%s\"", Const.DATE_CREATE_RESUME, dateCreate);
-        String cityCode = link.getProps().get(Const.AREA_CODE);
-        String cityCodeJson = String.format("\"%s\":\"%s\"", Const.AREA_CODE, cityCode);
+        String dateCreate = link.getProps().get(ClientConsts.DATE_CREATE_RESUME);
+        String dateCreateJson = String.format("\"%s\":\"%s\"", ClientConsts.DATE_CREATE_RESUME, dateCreate);
+        String cityCode = link.getProps().get(ClientConsts.AREA_CODE);
+        String cityCodeJson = String.format("\"%s\":\"%s\"", ClientConsts.AREA_CODE, cityCode);
 
         long getUrlStartTime = System.currentTimeMillis();
         seleniumBrowser.get(link.getUrl());

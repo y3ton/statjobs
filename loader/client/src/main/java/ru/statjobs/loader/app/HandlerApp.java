@@ -8,10 +8,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.statjobs.loader.Const;
-import ru.statjobs.loader.JsScript;
-import ru.statjobs.loader.LinkProcessor;
-import ru.statjobs.loader.SeleniumBrowser;
+import ru.statjobs.loader.*;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
 import ru.statjobs.loader.dao.RawDataStorageDaoJmsImpl;
@@ -42,8 +39,8 @@ public class HandlerApp {
 
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         HandlerApp handlerApp = new HandlerApp();
-        Properties props = new PropertiesUtils().loadProperties(Const.PROPERTIES_FILE);
-        for (int i = 0; i < Const.HANDLER_RESTART_ATTEMPT; i++) {
+        Properties props = new PropertiesUtils().loadProperties(Consts.PROPERTIES_FILE);
+        for (int i = 0; i < ClientConsts.HANDLER_RESTART_ATTEMPT; i++) {
             try {
                 handlerApp.process(props);
             } catch(Exception ex) {
@@ -55,8 +52,8 @@ public class HandlerApp {
                     LOGGER.error("Selenium close fail", closeException);
                 }
             }
-            LOGGER.info("Attempt {} finished, timeout {}", i, Const.HANDLER_RESTART_TIMEOUT);
-            Thread.sleep(Const.HANDLER_RESTART_TIMEOUT);
+            LOGGER.info("Attempt {} finished, timeout {}", i, ClientConsts.HANDLER_RESTART_TIMEOUT);
+            Thread.sleep(ClientConsts.HANDLER_RESTART_TIMEOUT);
         }
     }
 
@@ -77,7 +74,7 @@ public class HandlerApp {
 
         downloadableLinkDao = new DownloadableLinkDaoPostgresImpl(dbConnection, jsonUtils);
         //rawDataStorage = new RawDataStorageDaoPostgresImpl(connection);
-        rawDataStorage = new RawDataStorageDaoJmsImpl(connectionFactory, Const.RAW_QUEUE_NAME,  jsonUtils);
+        rawDataStorage = new RawDataStorageDaoJmsImpl(connectionFactory, Consts.RAW_QUEUE_NAME,  jsonUtils);
 
         seleniumBrowser = new SeleniumBrowser(
                 properties.getProperty("webdriverpath"),

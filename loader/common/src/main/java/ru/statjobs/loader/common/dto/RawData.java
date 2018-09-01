@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 
-public class RawData implements Serializable{
+public class RawData implements Serializable {
 
     private final DownloadableLink link;
     private final String json;

@@ -2,7 +2,7 @@ package ru.statjobs.loader.handlers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.statjobs.loader.Const;
+import ru.statjobs.loader.Consts;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
@@ -42,7 +42,7 @@ public class HhVacancyHandler implements LinkHandler{
         int responseCode = downloaderResult.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             String json = downloaderResult.getText();
-            if (json.length() > Const.MAX_RAW_JSON_LENGTH) {
+            if (json.length() > Consts.MAX_RAW_JSON_LENGTH) {
                 json = reduceMessageLength(json);
             }
             rawDataStorageDao.saveHhVacancy(link, json);

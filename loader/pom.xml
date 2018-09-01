@@ -15,6 +15,7 @@
         <logback.version>1.2.3</logback.version>
         <statjobs.project.version>1.0-SNAPSHOT</statjobs.project.version>
         <camel.version>2.22.0</camel.version>
+        <jetty.version>9.4.6.v20170531</jetty.version>
     </properties>
 
     <repositories>
@@ -52,6 +53,11 @@
                 <version>${statjobs.project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-client</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>javax.jms</groupId>
@@ -98,6 +104,11 @@
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-aws</artifactId>
+                <version>${camel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-jetty</artifactId>
                 <version>${camel.version}</version>
             </dependency>
             <dependency>
@@ -185,12 +196,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.tomakehurst</groupId>
-                <artifactId>wiremock</artifactId>
-                <version>2.12.0</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>1.4.196</version>
@@ -206,6 +211,12 @@
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito</artifactId>
                 <version>1.6.5</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
                 <scope>test</scope>
             </dependency>
 

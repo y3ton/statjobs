@@ -2,7 +2,8 @@ package ru.statjobs.loader.app;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.statjobs.loader.Const;
+import ru.statjobs.loader.ClientConsts;
+import ru.statjobs.loader.Consts;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dao.HhDictionaryDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
@@ -44,7 +45,7 @@ public class InitApp {
 
     public static void main(String[] args) throws IOException, SQLException {
         InitApp initApp = new InitApp();
-        Properties props = new PropertiesUtils().loadProperties(Const.PROPERTIES_FILE);
+        Properties props = new PropertiesUtils().loadProperties(Consts.PROPERTIES_FILE);
         initApp.process(props);
     }
 
@@ -72,8 +73,8 @@ public class InitApp {
             int sequenceNum = (int) Instant.now().getEpochSecond();
             LOGGER.info("sequenceNum: {}", sequenceNum);
             List<DownloadableLink> firstLink = new ArrayList<>();
-            firstLink.addAll(initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, experience, industries));
-            firstLink.addAll(initUrlCreator.initHhItResumeLink(urlConstructor, sequenceNum, Const.HH_PER_PAGE, cities, specialization, Const.HH_SEARCH_PERIOD));
+            firstLink.addAll(initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, ClientConsts.HH_PER_PAGE, cities, specialization, experience, industries));
+            firstLink.addAll(initUrlCreator.initHhItResumeLink(urlConstructor, sequenceNum, ClientConsts.HH_PER_PAGE, cities, specialization, ClientConsts.HH_SEARCH_PERIOD));
             firstLink.forEach(qownloadableLinkDao::createDownloadableLink);
             LOGGER.info("create {} link", firstLink.size());
         } catch (SQLException e) {

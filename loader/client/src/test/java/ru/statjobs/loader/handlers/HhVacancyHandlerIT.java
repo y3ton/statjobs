@@ -1,6 +1,8 @@
 package ru.statjobs.loader.handlers;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,19 +17,22 @@ import ru.statjobs.loader.testutils.H2Utils;
 import ru.statjobs.loader.utils.Downloader;
 import ru.statjobs.loader.utils.JsonUtils;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 public class HhVacancyHandlerIT {
 
     private static Connection connection;
-    private static WireMockServer wireMockServer = new WireMockServer();
+    private static Server jettyServer = new Server(8080);
     private static JsonUtils jsonUtils = new JsonUtils();
 
     private static DownloadableLinkDao dao;
@@ -43,27 +48,35 @@ public class HhVacancyHandlerIT {
 
         downloader = new Downloader();
         rawDataStorageDao = spy(new RawDataStorageDaoPostgresImpl(connection, false));
-        wireMockServer.start();
     }
 
     @After
-    public void stop() throws SQLException {
+    public void stop() throws Exception {
         connection.close();
-        wireMockServer.stop();
+        jettyServer.stop();
     }
 
     @Test
-    public void hhVacancyHandlerComplexTest() throws SQLException {
+    public void hhVacancyHandlerComplexTest() throws Exception {
         HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao, jsonUtils);
         DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlTypes.HH_VACANCY, null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
+        jettyServer.setHandler(new AbstractHandler() {
+            @Override
+            public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
+                if (!s.equals("/json1")) {
+                    throw new RuntimeException("wrong url " + s);
+                }
+                httpServletResponse.setContentType("text/xml");
+                httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+                httpServletResponse.getWriter().print("{[]}");
+                request.setHandled(true);
 
-        stubFor(get(urlEqualTo("/json1"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "text/xml")
-                        .withBody("{[]}")));
+            }
+        });
+        jettyServer.start();
+
         handler.process(dl);
 
         verify(
@@ -84,17 +97,23 @@ public class HhVacancyHandlerIT {
     }
 
     @Test
-    public void hhVacancyHandler404Test() throws SQLException {
+    public void hhVacancyHandler404Test() throws Exception {
         HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao, jsonUtils);
         DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlTypes.HH_VACANCY, null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
+        jettyServer.setHandler(new AbstractHandler() {
+            @Override
+            public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
+                if (!s.equals("/json1")) {
+                    throw new RuntimeException("wrong url " + s);
+                }
+                httpServletResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                request.setHandled(true);
+            }
+        });
+        jettyServer.start();
 
-        stubFor(get(urlEqualTo("/json1"))
-                .willReturn(aResponse()
-                        .withStatus(404)
-                        .withHeader("Content-Type", "text/xml")
-                        .withBody("{[]}")));
         handler.process(dl);
 
         verify(
@@ -109,17 +128,22 @@ public class HhVacancyHandlerIT {
     }
 
     @Test
-    public void hhVacancyHandler500Test() throws SQLException {
+    public void hhVacancyHandler500Test() throws Exception {
         HhVacancyHandler handler = new HhVacancyHandler(downloader, rawDataStorageDao, dao, jsonUtils);
         DownloadableLink dl = new DownloadableLink("http://localhost:8080/json1", 181, UrlTypes.HH_VACANCY, null);
         dao.createDownloadableLink(dl);
         Assert.assertNotNull(dao.getDownloadableLink());
-
-        stubFor(get(urlEqualTo("/json1"))
-                .willReturn(aResponse()
-                        .withStatus(500)
-                        .withHeader("Content-Type", "text/xml")
-                        .withBody("{[]}")));
+        jettyServer.setHandler(new AbstractHandler() {
+            @Override
+            public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
+                if (!s.equals("/json1")) {
+                    throw new RuntimeException("wrong url " + s);
+                }
+                httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                request.setHandled(true);
+            }
+        });
+        jettyServer.start();
         boolean except = false;
         try {
             handler.process(dl);
@@ -138,6 +162,4 @@ public class HhVacancyHandlerIT {
         Assert.assertFalse(resultSet.next());
         resultSet.close();
     }
-
-
 }

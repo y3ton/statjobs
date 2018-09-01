@@ -2,7 +2,7 @@ package ru.statjobs.loader.handlers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.statjobs.loader.Const;
+import ru.statjobs.loader.ClientConsts;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
@@ -21,7 +21,7 @@ public class HhListResumeHandler implements  LinkHandler  {
     private static final Logger LOGGER = LoggerFactory.getLogger(HhListResumeHandler.class);
 
     public final DateFormat jsFormat = new SimpleDateFormat("Обновлено dd MMMM, HH:mm", new Locale("ru"));
-    public final DateFormat outputFormat = new SimpleDateFormat(Const.DATE_FORMAT, new Locale("ru"));
+    public final DateFormat outputFormat = new SimpleDateFormat(ClientConsts.DATE_FORMAT, new Locale("ru"));
 
     private final SeleniumBrowser seleniumBrowser;
     private final JsScript jsScript;
@@ -54,8 +54,8 @@ public class HhListResumeHandler implements  LinkHandler  {
         list.stream()
                 .map(list2 -> {
                     Map<String, String> props = new HashMap();
-                    props.put(Const.DATE_CREATE_RESUME, formatDate(list2.get(1)));
-                    props.put(Const.AREA_CODE, urlConstructor.getParameter(Const.AREA_CODE, link.getUrl()));
+                    props.put(ClientConsts.DATE_CREATE_RESUME, formatDate(list2.get(1)));
+                    props.put(ClientConsts.AREA_CODE, urlConstructor.getParameter(ClientConsts.AREA_CODE, link.getUrl()));
                     return new DownloadableLink(
                             list2.get(0),
                             link.getSequenceNum(),

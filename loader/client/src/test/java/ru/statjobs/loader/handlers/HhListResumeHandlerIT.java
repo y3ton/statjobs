@@ -1,7 +1,7 @@
 package ru.statjobs.loader.handlers;
 
 import org.junit.*;
-import ru.statjobs.loader.Const;
+import ru.statjobs.loader.ClientConsts;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
@@ -78,9 +78,9 @@ public class HhListResumeHandlerIT {
 
         list = list.stream()
                 .filter(l -> !(
-                        l.getUrl().equals("url1") && l.getProps().get(Const.DATE_CREATE_RESUME).endsWith("-09-10 11:11:00") ||
-                                l.getUrl().equals("url2") && l.getProps().get(Const.DATE_CREATE_RESUME).endsWith("-01-10 00:00:00") ||
-                                l.getUrl().equals("url3") && l.getProps().get(Const.DATE_CREATE_RESUME).endsWith("-12-10 13:59:00") ||
+                        l.getUrl().equals("url1") && l.getProps().get(ClientConsts.DATE_CREATE_RESUME).endsWith("-09-10 11:11:00") ||
+                                l.getUrl().equals("url2") && l.getProps().get(ClientConsts.DATE_CREATE_RESUME).endsWith("-01-10 00:00:00") ||
+                                l.getUrl().equals("url3") && l.getProps().get(ClientConsts.DATE_CREATE_RESUME).endsWith("-12-10 13:59:00") ||
                                 l.getUrl().equals("url&page=1") && l.getHandlerName().equals(UrlTypes.HH_LIST_RESUME)
                 ))
                 .collect(Collectors.toList());

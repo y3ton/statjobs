@@ -4,7 +4,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.statjobs.loader.Const;
+import ru.statjobs.loader.ClientConsts;
 import ru.statjobs.loader.JsScript;
 import ru.statjobs.loader.SeleniumBrowser;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
@@ -57,8 +57,8 @@ public class HhResumeHandlerIT {
         dao.createDownloadableLink(
                 new DownloadableLink("url17", 17, UrlTypes.HH_LIST_RESUME,
                 new HashMap<String, String>() {{
-                    put(Const.AREA_CODE, "area1");
-                    put(Const.DATE_CREATE_RESUME, "date1");
+                    put(ClientConsts.AREA_CODE, "area1");
+                    put(ClientConsts.DATE_CREATE_RESUME, "date1");
                 }}));
         DownloadableLink initLink = dao.getDownloadableLink();
 

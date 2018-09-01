@@ -2,7 +2,7 @@ package ru.statjobs.loader.url;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.statjobs.loader.Const;
+import ru.statjobs.loader.ClientConsts;
 
 
 public class UrlConstructorTest {
@@ -164,7 +164,7 @@ public class UrlConstructorTest {
         Assert.assertEquals("normal", urlConstructor.getParameter("logic", url));
         Assert.assertEquals("all_time", urlConstructor.getParameter("exp_period", url));
         Assert.assertEquals("7", urlConstructor.getParameter("page", url));
-        Assert.assertEquals("1", urlConstructor.getParameter(Const.AREA_CODE, url));
+        Assert.assertEquals("1", urlConstructor.getParameter(ClientConsts.AREA_CODE, url));
     }
 
     @Test

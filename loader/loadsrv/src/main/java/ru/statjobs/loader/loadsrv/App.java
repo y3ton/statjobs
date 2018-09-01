@@ -13,6 +13,7 @@ import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.util.jndi.JndiContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.statjobs.loader.Consts;
 import ru.statjobs.loader.common.dto.RawData;
 import ru.statjobs.loader.dao.RawDataStorageDaoPostgresImpl;
 import ru.statjobs.loader.utils.PropertiesUtils;
@@ -27,9 +28,6 @@ import java.util.Scanner;
 
 public class App {
 
-    public static final String PROPERTIES_FILE = "app.properties";
-    public static final String RAW_QUEUE_NAME = "raw_queue";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
@@ -39,7 +37,7 @@ public class App {
             props = propertiesUtils.loadPropertiesFromFile(args[0]);
             LOGGER.info("Properties file name: {}", args[0]);
         } else {
-            props = propertiesUtils.loadProperties(PROPERTIES_FILE);
+            props = propertiesUtils.loadProperties(Consts.PROPERTIES_FILE);
             LOGGER.info("Properties file name do not set. Default properties is loaded");
         }
         JndiContext jndiContext = null;
@@ -116,7 +114,8 @@ public class App {
     public void createRoute(CamelContext camelContext) throws Exception {
             camelContext.addRoutes(new RouteBuilder() {
                 public void configure() {
-                    from("jms:" + RAW_QUEUE_NAME)
+                    from("jms:" + Consts.RAW_QUEUE_NAME)
+                    .from("jetty:" + "http://0.0.0.0:" +  Consts.ENDPOINT_PORT +  Consts.ENDPOINT_URL)
                     .routeId("a")
                     .doTry()
                         .unmarshal().json(JsonLibrary.Jackson, RawData.class)
