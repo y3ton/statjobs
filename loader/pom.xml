@@ -16,6 +16,7 @@
         <statjobs.project.version>1.0-SNAPSHOT</statjobs.project.version>
         <camel.version>2.22.0</camel.version>
         <jetty.version>9.4.6.v20170531</jetty.version>
+        <spring.version>5.0.9.RELEASE</spring.version>
     </properties>
 
     <repositories>
@@ -37,6 +38,7 @@
         <module>common</module>
         <module>dao</module>
         <module>loadsrv</module>
+        <module>linksrv</module>
     </modules>
 
     <dependencyManagement>
@@ -53,12 +55,47 @@
                 <version>${statjobs.project.version}</version>
             </dependency>
 
+
+            <!--Jetty-->
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-client</artifactId>
                 <version>${jetty.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-webapp</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
 
+
+            <!--Spring-->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>2.1.1</version>
+            </dependency>
             <dependency>
                 <groupId>javax.jms</groupId>
                 <artifactId>jms</artifactId>
@@ -79,8 +116,15 @@
             </dependency>
 
 
-            <!--camel-->
 
+            <dependency>
+                <groupId>redis.clients</groupId>
+                <artifactId>jedis</artifactId>
+                <version>2.9.0</version>
+            </dependency>
+
+
+            <!--camel-->
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-core</artifactId>
@@ -119,7 +163,6 @@
 
 
             <!--jackson-->
-
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
@@ -130,6 +173,8 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>2.9.2</version>
             </dependency>
+
+
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
@@ -213,12 +258,7 @@
                 <version>1.6.5</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-server</artifactId>
-                <version>${jetty.version}</version>
-                <scope>test</scope>
-            </dependency>
+
 
         </dependencies>
     </dependencyManagement>
