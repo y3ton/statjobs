@@ -4,39 +4,77 @@ import ai.grakn.redismock.RedisServer;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.util.StringContentProvider;
-import org.junit.*;
+import org.eclipse.jetty.http.HttpHeader;
+import org.eclipse.jetty.http.HttpMethod;
+import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.server.Server;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import redis.clients.jedis.Jedis;
+import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.common.url.UrlTypes;
+import ru.statjobs.loader.dao.DownloadableLinkDaoHttpImpl;
+import ru.statjobs.loader.utils.JsonUtils;
 
 public class AppIT {
 
-    Thread thread;
-    RedisServer redisServer;
-    HttpClient httpClient;
-    Jedis jedis;
+    static Server server;
+    static RedisServer redisServer;
+    static HttpClient httpClient;
+    static Jedis jedis;
+    static DownloadableLinkDaoHttpImpl daoHttp;
 
-    @Before
-    public void init() throws Exception {
+    @BeforeClass
+    public static void init() throws Exception {
         redisServer = RedisServer.newRedisServer();
         redisServer.start();
-        thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                App.process("127.0.0.1", redisServer.getBindPort());
-            }
-        });
-        thread.start();
+        jedis = new Jedis("127.0.0.1", redisServer.getBindPort());
         httpClient = new HttpClient();
         httpClient.start();
-        jedis = new Jedis("127.0.0.1", redisServer.getBindPort());
-        Thread.sleep(5000);
+        server = App.createServer("127.0.0.1", redisServer.getBindPort(), "authkey");
+        daoHttp = new DownloadableLinkDaoHttpImpl(new JsonUtils(), "http://localhost:8080/linksrv", "authkey");
+        daoHttp.start();
     }
 
-    @After
-    public void close() throws Exception {
-        thread.interrupt();
+    @AfterClass
+    public static void close() throws Exception {
         httpClient.stop();
         redisServer.stop();
         jedis.close();
+        server.stop();
+        daoHttp.stop();
+    }
+
+    @Test
+    public void integrationWithDaoTest() {
+        daoHttp.createDownloadableLink(new DownloadableLink("URL111", 1, UrlTypes.HH_RESUME, null));
+        daoHttp.createDownloadableLink(new DownloadableLink("URL111", 1, UrlTypes.HH_RESUME, null));
+        daoHttp.createDownloadableLink(new DownloadableLink("URL222", 1, UrlTypes.HH_RESUME, null));
+
+        Assert.assertEquals("URL222", daoHttp.getDownloadableLink().getUrl());
+        Assert.assertEquals("URL111", daoHttp.getDownloadableLink().getUrl());
+        Assert.assertNull(daoHttp.getDownloadableLink());
+
+        daoHttp.deleteDownloadableLink(new DownloadableLink("URL111", 1, UrlTypes.HH_RESUME, null));
+        Assert.assertEquals("CREATE", jedis.get("1:URL222"));
+        Assert.assertEquals("DELETE", jedis.get("1:URL111"));
+    }
+
+    @Test
+    public void integrationWithDaoFailAuthTest() {
+        DownloadableLinkDaoHttpImpl daoHttpFail =
+                new DownloadableLinkDaoHttpImpl(new JsonUtils(), "http://localhost:8080/linksrv", "");
+        daoHttpFail.start();
+        try {
+            daoHttpFail.getDownloadableLink();
+            Assert.fail();
+        } catch (Exception ex) {
+            // ok
+        } finally {
+            daoHttpFail.stop();
+        }
     }
 
     @Test
@@ -44,33 +82,58 @@ public class AppIT {
 
         ContentResponse response;
 
-        response = httpClient.GET("http://127.0.0.1:8080/linksrv/get");
+        response = httpClient.newRequest("http://127.0.0.1:8080/linksrv/get")
+                .header(HttpHeader.AUTHORIZATION, "authkey")
+                .method(HttpMethod.GET)
+                .send();
         Assert.assertEquals("", response.getContentAsString());
 
         response = httpClient.POST("http://localhost:8080/linksrv/create")
+            .header(HttpHeader.AUTHORIZATION, "authkey")
             .content(new StringContentProvider(createJson("u1111")), "application/json").send();
         Assert.assertEquals("true", response.getContentAsString());
 
         response = httpClient.POST("http://localhost:8080/linksrv/create")
+                .header(HttpHeader.AUTHORIZATION, "authkey")
                 .content(new StringContentProvider(createJson("u1111")), "application/json").send();
         Assert.assertEquals("true", response.getContentAsString());
 
         response = httpClient.POST("http://localhost:8080/linksrv/create")
+                .header(HttpHeader.AUTHORIZATION, "authkey")
                 .content(new StringContentProvider(createJson("u2222")), "application/json").send();
         Assert.assertEquals("true", response.getContentAsString());
 
-        response = httpClient.GET("http://127.0.0.1:8080/linksrv/get");
+        response = httpClient.newRequest("http://127.0.0.1:8080/linksrv/get")
+                .header(HttpHeader.AUTHORIZATION, "authkey")
+                .method(HttpMethod.GET)
+                .send();
         Assert.assertTrue(response.getContentAsString().contains("u2222"));
-        response = httpClient.GET("http://127.0.0.1:8080/linksrv/get");
+        response = httpClient.newRequest("http://127.0.0.1:8080/linksrv/get")
+                .header(HttpHeader.AUTHORIZATION, "authkey")
+                .method(HttpMethod.GET)
+                .send();
         Assert.assertTrue(response.getContentAsString().contains("u1111"));
-        response = httpClient.GET("http://127.0.0.1:8080/linksrv/get");
+        response = httpClient.newRequest("http://127.0.0.1:8080/linksrv/get")
+                .header(HttpHeader.AUTHORIZATION, "authkey")
+                .method(HttpMethod.GET)
+                .send();
         Assert.assertEquals("", response.getContentAsString());
 
         response = httpClient.POST("http://localhost:8080/linksrv/delete")
+                .header(HttpHeader.AUTHORIZATION, "authkey")
                 .content(new StringContentProvider(createJson("u2222")), "application/json").send();
         Assert.assertEquals("true", response.getContentAsString());
         Assert.assertEquals("CREATE", jedis.get("0:u1111"));
         Assert.assertEquals("DELETE",jedis.get("0:u2222"));
+    }
+
+    @Test
+    public void failAuthTest() throws Exception {
+        ContentResponse response = httpClient.newRequest("http://127.0.0.1:8080/linksrv/get")
+                .header(HttpHeader.AUTHORIZATION, "11111111111111")
+                .method(HttpMethod.GET)
+                .send();
+        Assert.assertEquals(HttpStatus.FORBIDDEN_403, response.getStatus());
     }
 
     String createJson(String url) {

@@ -9,7 +9,9 @@ import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import javax.servlet.DispatcherType;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.Scanner;
 
 
@@ -19,48 +21,41 @@ public class App {
 
     public static final String REDIS_HOST = "REDIS_HOST";
     public static final String REDIS_PORT = "REDIS_PORT";
+    public static final String AUTH = "AUTH";
     public static final int SEVER_PORT = 8080;
 
 
     public static void main(String[] args) throws Exception {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                process("192.168.1.105", 6379);
-            }
-        });
-        thread.start();
+        Server server = createServer("192.168.1.105", 6379, "");
 
         /* wait pres q */
         Scanner sc = new Scanner(System.in);
         while (true) {
             if (sc.hasNext()) {
                 if (sc.next().toLowerCase().contains("q")) {
-                    thread.interrupt();
+                    server.stop();
                     break;
                 }
             }
         }
     }
 
-    public static void process(String redisHost, int redisPort) {
+    public static Server createServer(String redisHost, int redisPort, String seqKey) {
+        Server server;
         try {
             WebAppContext webapp = createContext();
             webapp.getServletContext().setAttribute(REDIS_HOST, redisHost);
             webapp.getServletContext().setAttribute(REDIS_PORT, redisPort);
+            webapp.getServletContext().setAttribute(AUTH, seqKey);
             LOGGER.info("Redis host: {}", redisHost);
             LOGGER.info("Start Server port {}", SEVER_PORT);
-            Server server = new Server(SEVER_PORT);
+            server = new Server(SEVER_PORT);
             server.setHandler(webapp);
             server.start();
-            try {
-                server.join();
-            } catch (InterruptedException e) {
-                LOGGER.info("Server interupted");
-            }
-            server.stop();
+            return server;
         } catch (Exception e) {
             LOGGER.error("Server fail", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -73,6 +68,7 @@ public class App {
         servletHolder.setAsyncSupported(true);
         servletHolder.setInitOrder(1);
         webapp.addServlet(servletHolder, "/");
+        webapp.addFilter(AuthFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 
         webapp.setInitParameter("contextConfigLocation", LinkSrvMvcConf.class.getName());
         webapp.addEventListener(new ContextLoaderListener(webContext));
