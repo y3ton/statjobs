@@ -1,13 +1,11 @@
 package ru.statjobs.loader.linksrv.dao;
 
-import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import java.io.Closeable;
 
-@Service
 public class RedisDao implements RedisMap, RedisQueue, Closeable {
 
     final JedisPool pool;

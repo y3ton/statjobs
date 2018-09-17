@@ -1,12 +1,14 @@
 package ru.statjobs.loader.linksrv;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.linksrv.dao.RedisMap;
 import ru.statjobs.loader.linksrv.dao.RedisQueue;
 import ru.statjobs.loader.utils.JsonUtils;
 
+@Service
 public class LinkSrvController implements DownloadableLinkDao {
 
     private final RedisMap redisMap;

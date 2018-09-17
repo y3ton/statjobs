@@ -91,4 +91,10 @@ public class LinkSrvControllerTest {
         Assert.assertEquals("U1", controller.getDownloadableLink().getUrl());
     }
 
+    @Test
+    public void createHashTest() {
+        Assert.assertEquals("12:url11", LinkSrvController.createHash(new DownloadableLink("url11", 12, UrlTypes.HH_LIST_RESUME, null)));
+        Assert.assertEquals("0:777", LinkSrvController.createHash(new DownloadableLink("777", 0, UrlTypes.HH_LIST_RESUME, null)));
+    }
+
 }

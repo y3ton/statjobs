@@ -1,5 +1,6 @@
 package ru.statjobs.loader.linksrv;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
@@ -13,13 +14,16 @@ import javax.ws.rs.core.MediaType;
 @RequestMapping("/linksrv")
 public class LinkSrvView implements DownloadableLinkDao {
 
+    @Autowired
+    LinkSrvController controller;
+
     @Override
     @PostMapping(value = "/create")
     @ResponseBody
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public boolean createDownloadableLink(@RequestBody DownloadableLink link) {
-        return false;
+        return controller.createDownloadableLink(link);
     }
 
     @Override
@@ -27,8 +31,8 @@ public class LinkSrvView implements DownloadableLinkDao {
     @ResponseBody
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public boolean deleteDownloadableLink(DownloadableLink link) {
-        return false;
+    public boolean deleteDownloadableLink(@RequestBody DownloadableLink link) {
+        return controller.deleteDownloadableLink(link);
     }
 
     @Override
@@ -36,7 +40,7 @@ public class LinkSrvView implements DownloadableLinkDao {
     @ResponseBody
     @Produces(MediaType.APPLICATION_JSON)
     public DownloadableLink getDownloadableLink() {
-        return null;
+        return controller.getDownloadableLink();
     }
 
 
