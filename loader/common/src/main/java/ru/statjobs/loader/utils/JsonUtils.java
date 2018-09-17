@@ -45,4 +45,15 @@ public class JsonUtils {
         }
     }
 
+    public <T> T readString(String json, Class<T> clazz) {
+        if (StringUtils.isBlank(json)) {
+            return null;
+        }
+        try {
+            return mapper.readValue(json, clazz);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

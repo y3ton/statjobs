@@ -1,43 +1,55 @@
 package ru.statjobs.loader.linksrv;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
+import ru.statjobs.loader.linksrv.dao.RedisMap;
+import ru.statjobs.loader.linksrv.dao.RedisQueue;
+import ru.statjobs.loader.utils.JsonUtils;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-@Controller
-@RequestMapping("/linksrv")
 public class LinkSrvController implements DownloadableLinkDao {
 
+    private final RedisMap redisMap;
+
+    private final RedisQueue redisQueue;
+
+    private final JsonUtils jsonUtils;
+
+    public static final String QUEUE_NAME = "outLinks";
+
+    public LinkSrvController(
+            @Autowired RedisMap redisMap,
+            @Autowired RedisQueue redisQueue,
+            @Autowired JsonUtils jsonUtils
+    ) {
+        this.redisMap = redisMap;
+        this.redisQueue = redisQueue;
+        this.jsonUtils = jsonUtils;
+    }
+
+
     @Override
-    @PostMapping(value = "/create")
-    @ResponseBody
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public boolean createDownloadableLink(@RequestBody DownloadableLink link) {
-        return false;
+    public boolean createDownloadableLink(DownloadableLink link) {
+        if (redisMap.setIfNotExists(createHash(link), DownloadableLinkStatusEnum.CREATE.name())) {
+            redisQueue.push(QUEUE_NAME, jsonUtils.createString(link));
+        }
+        return true;
     }
 
     @Override
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    @ResponseBody
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     public boolean deleteDownloadableLink(DownloadableLink link) {
-        return false;
+        redisMap.set(createHash(link), DownloadableLinkStatusEnum.DELETE.name());
+        return true;
     }
 
     @Override
-    @RequestMapping(value = "/get", method = RequestMethod.GET)
-    @ResponseBody
-    @Produces(MediaType.APPLICATION_JSON)
     public DownloadableLink getDownloadableLink() {
-        return null;
+        String json = redisQueue.pop(QUEUE_NAME);
+        return  json == null ? null : jsonUtils.readString(json, DownloadableLink.class);
     }
 
+    public static String createHash(DownloadableLink link) {
+        return link.getSequenceNum() + ":" + link.getUrl();
+    }
 
 }

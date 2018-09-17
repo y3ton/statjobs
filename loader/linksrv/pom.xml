@@ -70,6 +70,16 @@
             <artifactId>logback-core</artifactId>
         </dependency>
 
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.grakn</groupId>
+            <artifactId>redis-mock</artifactId>
+        </dependency>
+
 
     </dependencies>
 

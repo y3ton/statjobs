@@ -33,6 +33,26 @@ public class JsonUtilsTest {
     }
 
     @Test
+    public void readStringToObjectTest() {
+        AT at1 = new AT();
+        at1.setI(1);
+        at1.setS("at1");
+
+        AT at2 = new AT();
+        at2.setI(2);
+        at2.setS("at2");
+        at2.setAt(at1);
+
+        String json = jsonUtils.createString(at2);
+        AT at = jsonUtils.readString(json, AT.class);
+
+        Assert.assertEquals(2, at.getI());
+        Assert.assertEquals("at2", at.getS());
+        Assert.assertEquals(1, at.getAt().getI());
+        Assert.assertEquals("at1", at.getAt().getS());
+    }
+
+    @Test
     public void readEmptyStringTest() {
         Map map = jsonUtils.readString(null);
         Assert.assertTrue(map.isEmpty());
@@ -85,6 +105,36 @@ public class JsonUtilsTest {
         Map map = new HashMap();
         map.put(new Object(), new Object());
         jsonUtils.createString(map);
+    }
+
+    public static class AT {
+        private String s;
+        private AT at;
+        private int i;
+
+        public String getS() {
+            return s;
+        }
+
+        public void setS(String s) {
+            this.s = s;
+        }
+
+        public AT getAt() {
+            return at;
+        }
+
+        public void setAt(AT at) {
+            this.at = at;
+        }
+
+        public int getI() {
+            return i;
+        }
+
+        public void setI(int i) {
+            this.i = i;
+        }
     }
 
 }
