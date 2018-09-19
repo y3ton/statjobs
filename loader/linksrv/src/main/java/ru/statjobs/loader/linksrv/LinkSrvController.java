@@ -32,16 +32,17 @@ public class LinkSrvController implements DownloadableLinkDao {
 
     @Override
     public boolean createDownloadableLink(DownloadableLink link) {
-        if (redisMap.setIfNotExists(createHash(link), DownloadableLinkStatusEnum.CREATE.name())) {
-            redisQueue.push(QUEUE_NAME, jsonUtils.createString(link));
+        String json = jsonUtils.createString(link);
+        if (redisMap.setIfNotExists(createHash(link), "")) {
+            redisMap.set(createProceesLinkHash(link), json);
+            redisQueue.push(QUEUE_NAME, json);
         }
         return true;
     }
 
     @Override
     public boolean deleteDownloadableLink(DownloadableLink link) {
-        redisMap.set(createHash(link), DownloadableLinkStatusEnum.DELETE.name());
-        return true;
+        return redisMap.del(createProceesLinkHash(link)) != 0;
     }
 
     @Override
@@ -51,7 +52,11 @@ public class LinkSrvController implements DownloadableLinkDao {
     }
 
     public static String createHash(DownloadableLink link) {
-        return link.getSequenceNum() + ":" + link.getUrl();
+        return "C:" + link.getSequenceNum() + ":" + link.getUrl();
+    }
+
+    public static String createProceesLinkHash(DownloadableLink link) {
+        return "P:" + link.getSequenceNum() + ":" + link.getUrl();
     }
 
 }

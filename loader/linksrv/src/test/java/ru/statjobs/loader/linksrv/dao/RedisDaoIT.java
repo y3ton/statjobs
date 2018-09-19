@@ -38,7 +38,17 @@ public class RedisDaoIT {
         Assert.assertEquals("v2", redisDao.get("key1"));
 
         Assert.assertTrue(redisDao.setIfNotExists("key22222", "vvvvvvvv"));
+
         Assert.assertEquals("vvvvvvvv", redisDao.get("key22222"));
+        Assert.assertEquals("v2", redisDao.get("key1"));
+
+        redisDao.del("key1");
+        Assert.assertEquals("vvvvvvvv", redisDao.get("key22222"));
+        Assert.assertNull(redisDao.get("key1"));
+
+        redisDao.del("key22222");
+        Assert.assertNull(redisDao.get("key22222"));
+        Assert.assertNull(redisDao.get("key1"));
 
         ((RedisDao)redisDao).close();
     }

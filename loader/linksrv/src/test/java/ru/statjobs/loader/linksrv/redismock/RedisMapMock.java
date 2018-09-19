@@ -15,6 +15,11 @@ public class RedisMapMock implements RedisMap {
     }
 
     @Override
+    public Long del(String key) {
+        return map.remove(key) != null ? 1L: 0L;
+    }
+
+    @Override
     public String set(String key, String value) {
         return map.put(key, value);
     }

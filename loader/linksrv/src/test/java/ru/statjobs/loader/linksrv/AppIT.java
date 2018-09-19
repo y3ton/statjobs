@@ -49,17 +49,29 @@ public class AppIT {
 
     @Test
     public void integrationWithDaoTest() {
-        daoHttp.createDownloadableLink(new DownloadableLink("URL111", 1, UrlTypes.HH_RESUME, null));
-        daoHttp.createDownloadableLink(new DownloadableLink("URL111", 1, UrlTypes.HH_RESUME, null));
-        daoHttp.createDownloadableLink(new DownloadableLink("URL222", 1, UrlTypes.HH_RESUME, null));
+        daoHttp.createDownloadableLink(new DownloadableLink("URL111", 0, UrlTypes.HH_RESUME, null));
+        daoHttp.createDownloadableLink(new DownloadableLink("URL111", 0, UrlTypes.HH_RESUME, null));
+        daoHttp.createDownloadableLink(new DownloadableLink("URL222", 0, UrlTypes.HH_RESUME, null));
+
+        Assert.assertEquals(createJson("URL111"), jedis.get("P:0:URL111"));
+        Assert.assertEquals("", jedis.get("C:0:URL111"));
+        Assert.assertEquals(createJson("URL222"), jedis.get("P:0:URL222"));
+        Assert.assertEquals("", jedis.get("C:0:URL222"));
 
         Assert.assertEquals("URL222", daoHttp.getDownloadableLink().getUrl());
         Assert.assertEquals("URL111", daoHttp.getDownloadableLink().getUrl());
         Assert.assertNull(daoHttp.getDownloadableLink());
+        Assert.assertEquals(createJson("URL111"), jedis.get("P:0:URL111"));
+        Assert.assertEquals("", jedis.get("C:0:URL111"));
+        Assert.assertEquals(createJson("URL222"), jedis.get("P:0:URL222"));
+        Assert.assertEquals("", jedis.get("C:0:URL222"));
 
-        daoHttp.deleteDownloadableLink(new DownloadableLink("URL111", 1, UrlTypes.HH_RESUME, null));
-        Assert.assertEquals("CREATE", jedis.get("1:URL222"));
-        Assert.assertEquals("DELETE", jedis.get("1:URL111"));
+
+        daoHttp.deleteDownloadableLink(new DownloadableLink("URL111", 0, UrlTypes.HH_RESUME, null));
+        Assert.assertEquals(null, jedis.get("P:0:URL111"));
+        Assert.assertEquals("", jedis.get("C:0:URL111"));
+        Assert.assertEquals(createJson("URL222"), jedis.get("P:0:URL222"));
+        Assert.assertEquals("", jedis.get("C:0:URL222"));
     }
 
     @Test
@@ -92,27 +104,40 @@ public class AppIT {
             .header(HttpHeader.AUTHORIZATION, "authkey")
             .content(new StringContentProvider(createJson("u1111")), "application/json").send();
         Assert.assertEquals("true", response.getContentAsString());
+        Assert.assertEquals(createJson("u1111"), jedis.get("P:0:u1111"));
+        Assert.assertNotNull(jedis.get("C:0:u1111"));
+
 
         response = httpClient.POST("http://localhost:8080/linksrv/create")
                 .header(HttpHeader.AUTHORIZATION, "authkey")
-                .content(new StringContentProvider(createJson("u1111")), "application/json").send();
+                .content(new StringContentProvider(createJson("u1111").replace("HH_RESUME", "HH_LIST_RESUME")), "application/json").send();
         Assert.assertEquals("true", response.getContentAsString());
+        Assert.assertEquals(createJson("u1111"), jedis.get("P:0:u1111"));
+        Assert.assertNotNull(jedis.get("C:0:u1111"));
 
         response = httpClient.POST("http://localhost:8080/linksrv/create")
                 .header(HttpHeader.AUTHORIZATION, "authkey")
                 .content(new StringContentProvider(createJson("u2222")), "application/json").send();
         Assert.assertEquals("true", response.getContentAsString());
+        Assert.assertEquals(createJson("u2222"), jedis.get("P:0:u2222"));
+        Assert.assertNotNull(jedis.get("C:0:u2222"));
 
         response = httpClient.newRequest("http://127.0.0.1:8080/linksrv/get")
                 .header(HttpHeader.AUTHORIZATION, "authkey")
                 .method(HttpMethod.GET)
                 .send();
         Assert.assertTrue(response.getContentAsString().contains("u2222"));
+        Assert.assertEquals(createJson("u2222"), jedis.get("P:0:u2222"));
+        Assert.assertNotNull(jedis.get("C:0:u2222"));
+
         response = httpClient.newRequest("http://127.0.0.1:8080/linksrv/get")
                 .header(HttpHeader.AUTHORIZATION, "authkey")
                 .method(HttpMethod.GET)
                 .send();
         Assert.assertTrue(response.getContentAsString().contains("u1111"));
+        Assert.assertEquals(createJson("u1111"), jedis.get("P:0:u1111"));
+        Assert.assertNotNull(jedis.get("C:0:u1111"));
+
         response = httpClient.newRequest("http://127.0.0.1:8080/linksrv/get")
                 .header(HttpHeader.AUTHORIZATION, "authkey")
                 .method(HttpMethod.GET)
@@ -123,8 +148,8 @@ public class AppIT {
                 .header(HttpHeader.AUTHORIZATION, "authkey")
                 .content(new StringContentProvider(createJson("u2222")), "application/json").send();
         Assert.assertEquals("true", response.getContentAsString());
-        Assert.assertEquals("CREATE", jedis.get("0:u1111"));
-        Assert.assertEquals("DELETE",jedis.get("0:u2222"));
+        Assert.assertNull(jedis.get("P:0:u2222"));
+        Assert.assertEquals("",jedis.get("C:0:u2222"));
     }
 
     @Test
@@ -137,7 +162,7 @@ public class AppIT {
     }
 
     String createJson(String url) {
-        return "{\"url\":\"" + url + "\",\"sequenceNum\":0,\"handlerName\":\"HH_RESUME\",\"props\":null},\"json\":\"{}\"}";
+        return "{\"url\":\"" + url + "\",\"sequenceNum\":0,\"handlerName\":\"HH_RESUME\",\"props\":null}";
     }
 
 }

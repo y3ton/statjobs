@@ -27,6 +27,13 @@ public class RedisDao implements RedisMap, RedisQueue, Closeable {
     }
 
     @Override
+    public Long del(String key) {
+        try (Jedis jedis = pool.getResource()) {
+            return jedis.del(key);
+        }
+    }
+
+    @Override
     public String set(String key, String value) {
         try (Jedis jedis = pool.getResource()) {
             return jedis.set(key, value);
