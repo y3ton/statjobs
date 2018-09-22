@@ -1,11 +1,10 @@
 # docker build -t loadsrv -f ./Dockerfile .
-# docker run -i loadsrv:latest
+# docker run -i -v /conf/:/loadsrv/conf -p 8087:8087 loadsrv:latest
 
 FROM openjdk:alpine
 
 RUN mkdir          /loadsrv
+RUN mkdir          /loadsrv/conf
 COPY ./loadsrv.jar /loadsrv/loadsrv.jar
-COPY ./app.conf    /loadsrv/app.conf
-COPY ./credsqs     /loadsrv/credsqs
 
-CMD ["java", "-jar", "/loadsrv/loadsrv.jar", "/loadsrv/app.conf"]
+CMD ["java", "-jar", "/loadsrv/loadsrv.jar", "/loadsrv/conf/app.conf"]

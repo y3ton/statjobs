@@ -8,10 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import ru.statjobs.loader.Consts;
+import ru.statjobs.loader.utils.PropertiesUtils;
 
 import javax.servlet.DispatcherType;
 import java.net.URL;
 import java.util.EnumSet;
+import java.util.Properties;
 import java.util.Scanner;
 
 
@@ -23,10 +26,25 @@ public class App {
     public static final String REDIS_PORT = "REDIS_PORT";
     public static final String AUTH = "AUTH";
     public static final int SEVER_PORT = 8080;
-
+    public static final int REDIS_DEFAULT_PORT = 6379;
 
     public static void main(String[] args) throws Exception {
-        Server server = createServer("192.168.1.105", 6379, "");
+
+        PropertiesUtils propertiesUtils = new PropertiesUtils();
+        Properties props;
+        if (args.length > 0) {
+            props = propertiesUtils.loadPropertiesFromFile(args[0]);
+            LOGGER.info("Properties file name: {}", args[0]);
+        } else {
+            props = propertiesUtils.loadProperties(Consts.PROPERTIES_FILE);
+            LOGGER.info("Properties file name do not set. Default properties is loaded");
+        }
+
+        Server server = createServer(
+                (String)props.get("redis"),
+                REDIS_DEFAULT_PORT,
+                (String)props.get("linksrvkey")
+        );
 
         /* wait pres q */
         Scanner sc = new Scanner(System.in);
@@ -38,6 +56,7 @@ public class App {
                 }
             }
         }
+        LOGGER.info("Linksrv is stopped");
     }
 
     public static Server createServer(String redisHost, int redisPort, String seqKey) {

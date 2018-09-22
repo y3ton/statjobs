@@ -17,7 +17,7 @@ public class RawDataStorageDaoHttpImplIT {
 
     private final static JsonUtils jsonUtils = new JsonUtils();
 
-    private final static RawDataStorageDaoHttpImpl daoHttp = new RawDataStorageDaoHttpImpl(jsonUtils, "http://127.0.0.1:18080/");
+    private final static RawDataStorageDaoHttpImpl daoHttp = new RawDataStorageDaoHttpImpl(jsonUtils, "http://127.0.0.1:18080/", "key");
     private final static Server server = new Server(18080);
 
     @BeforeClass

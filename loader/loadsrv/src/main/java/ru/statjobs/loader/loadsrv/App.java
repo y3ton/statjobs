@@ -1,13 +1,7 @@
 package ru.statjobs.loader.loadsrv;
 
-import com.amazon.sqs.javamessaging.ProviderConfiguration;
-import com.amazon.sqs.javamessaging.SQSConnectionFactory;
-import com.amazonaws.auth.PropertiesFileCredentialsProvider;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.util.jndi.JndiContext;
@@ -57,7 +51,7 @@ public class App {
             jndiContext.bind("postgresDao", postgresDao);
 
             camelContext = new DefaultCamelContext(jndiContext);
-
+/*
             // ActiveMQ Connection
             //ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(props.getProperty("ActiveMqRawDataUrl"));
             // AWS SQS Connection
@@ -66,12 +60,13 @@ public class App {
                     AmazonSQSClientBuilder.standard()
                             .withRegion(Regions.US_WEST_2)
                             .withCredentials(new PropertiesFileCredentialsProvider(props.getProperty("awscredfile")))
-            );/**/
+            );
             LOGGER.info("JMS factory created: {}", connection.getClass().getName());
             camelContext.addComponent("jms", JmsComponent.jmsComponentAutoAcknowledge(connectionFactory));
+            */
 
             /*start process*/
-            new App().createRoute(camelContext);
+            new App().createRoute(camelContext, props, false);
             camelContext.start();
 
             /* wait pres q */
@@ -111,11 +106,17 @@ public class App {
         LOGGER.info("Load service stopped");
     }
 
-    public void createRoute(CamelContext camelContext) throws Exception {
+    public void createRoute(CamelContext camelContext, Properties props, boolean fromJms) throws Exception {
             camelContext.addRoutes(new RouteBuilder() {
                 public void configure() {
-                    from("jms:" + Consts.RAW_QUEUE_NAME)
-                    .from("jetty:" + "http://0.0.0.0:" +  Consts.ENDPOINT_PORT +  Consts.ENDPOINT_URL)
+                    ((fromJms) ?
+                            from("jms:" + Consts.RAW_QUEUE_NAME)
+                            :
+                            (
+                                    from("jetty:" + "http://0.0.0.0:" +  Consts.ENDPOINT_PORT +  Consts.ENDPOINT_URL)
+                                    .filter(header("Authorization").isEqualTo(props.getProperty("linksrvkey")))
+                            )
+                    )
                     .routeId("a")
                     .doTry()
                         .unmarshal().json(JsonLibrary.Jackson, RawData.class)

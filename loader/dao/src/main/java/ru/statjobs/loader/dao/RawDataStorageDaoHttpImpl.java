@@ -19,6 +19,7 @@ public class RawDataStorageDaoHttpImpl implements RawDataStorageDao {
 
     private final JsonUtils jsonUtils;
     private final String url;
+    private final String authKey;
 
     private HttpClient httpClient = new HttpClient();
 
@@ -38,9 +39,10 @@ public class RawDataStorageDaoHttpImpl implements RawDataStorageDao {
         }
     }
 
-    public RawDataStorageDaoHttpImpl(JsonUtils jsonUtils, String url) {
+    public RawDataStorageDaoHttpImpl(JsonUtils jsonUtils, String url, String authKey) {
         this.jsonUtils = jsonUtils;
         this.url = url;
+        this.authKey = authKey;
     }
 
     @Override
@@ -60,6 +62,7 @@ public class RawDataStorageDaoHttpImpl implements RawDataStorageDao {
         try {
             response = httpClient
                     .POST(url)
+                    .header("Authorization", authKey)
                     .content(new StringContentProvider(message), "application/json")
                     .send();
         } catch (Exception e) {
