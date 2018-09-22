@@ -8,6 +8,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 public class AuthFilter implements Filter {
 
@@ -20,9 +21,8 @@ public class AuthFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
-        if (StringUtils.isBlank(secKey)
-                || secKey.equals(((HttpServletRequest)request).getHeaders(HttpHeader.AUTHORIZATION.asString()).nextElement())) {
+        Enumeration enumeration = ((HttpServletRequest)request).getHeaders(HttpHeader.AUTHORIZATION.asString());
+        if (StringUtils.isBlank(secKey) || (enumeration.hasMoreElements() && secKey.equals(enumeration.nextElement()))) {
             chain.doFilter(request, response);
         } else {
             ((HttpServletResponse) response).sendError(HttpStatus.FORBIDDEN.value());
