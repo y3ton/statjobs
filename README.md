@@ -2,9 +2,9 @@ Data loader from internet sites.
 
 
 Components:
-client  - it loads data through Selenium or HttpClient.
-loadsrv - it saves data to DB.
-linksrv - it saves / gives the links that need to be processed.
+*client  - it loads data through Selenium or HttpClient.
+*loadsrv - it saves data to DB.
+*linksrv - it saves / gives the links that need to be processed.
 	
 ```no-highlight
 
