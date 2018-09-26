@@ -2,9 +2,8 @@ package ru.statjobs.loader.dao;
 
 
 import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.client.api.ContentResponse;
+import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.util.StringContentProvider;
-import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
@@ -12,14 +11,19 @@ import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.RawData;
 import ru.statjobs.loader.utils.JsonUtils;
 
+import java.util.function.Supplier;
+
 
 public class RawDataStorageDaoHttpImpl implements RawDataStorageDao {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RawDataStorageDaoHttpImpl.class);
 
+    public final static int SEND_COUNT_ATTEMPT = 3;
+
     private final JsonUtils jsonUtils;
     private final String url;
     private final String authKey;
+    private final HttpUtils httpUtils;
 
     private HttpClient httpClient = new HttpClient();
 
@@ -39,10 +43,11 @@ public class RawDataStorageDaoHttpImpl implements RawDataStorageDao {
         }
     }
 
-    public RawDataStorageDaoHttpImpl(JsonUtils jsonUtils, String url, String authKey) {
+    public RawDataStorageDaoHttpImpl(HttpUtils httpUtils, JsonUtils jsonUtils, String url, String authKey) {
         this.jsonUtils = jsonUtils;
         this.url = url;
         this.authKey = authKey;
+        this.httpUtils = httpUtils;
     }
 
     @Override
@@ -56,24 +61,18 @@ public class RawDataStorageDaoHttpImpl implements RawDataStorageDao {
     }
 
     private void send(DownloadableLink link, String json) {
-        ContentResponse response;
         RawData rawData = new RawData(link, json);
         String message = jsonUtils.createString(rawData);
+        Supplier<Request> request = () -> httpClient.POST(url)
+                .header("Authorization", authKey)
+                .content(new StringContentProvider(message), "application/json");
         try {
-            response = httpClient
-                    .POST(url)
-                    .header("Authorization", authKey)
-                    .content(new StringContentProvider(message), "application/json")
-                    .send();
+            httpUtils.send(request, SEND_COUNT_ATTEMPT);
         } catch (Exception e) {
-            LOGGER.error("fail send json {} to url {}", json, url);
-            throw new RuntimeException("fail message " +  url +  " " + message, e);
+            LOGGER.error("fail send json:{} to url: {}", json, url);
+            throw new RuntimeException(e);
         }
-        if (response.getStatus() != HttpStatus.OK_200) {
-            LOGGER.error("response status {}, json {}, url {}", json, url, response.getStatus());
-            throw new RuntimeException("fail message code:" + response.getStatus() + ", url:" +  url +  ", message:" + message);
-        }
-
-
     }
+
+
 }

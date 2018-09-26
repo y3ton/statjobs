@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HhListVacanciesHandler implements  LinkHandler {
 
@@ -51,11 +52,12 @@ public class HhListVacanciesHandler implements  LinkHandler {
         List<Map<String, Object>> items = (List<Map<String, Object>>) map.get("items");
         // hh page has no data
         if (items.size() != 0) {
-            items.stream()
+            List<DownloadableLink> links = items.stream()
                     .map(item -> (String) item.get("url"))
                     .filter(StringUtils::isNotBlank)
                     .map(urlVacancy -> new DownloadableLink(urlVacancy, link.getSequenceNum(), UrlTypes.HH_VACANCY, null))
-                    .forEach(downloadableLinkDao::createDownloadableLink);
+                    .collect(Collectors.toList());
+            downloadableLinkDao.createDownloadableLinks(links);
 
             DownloadableLink nextLink = new DownloadableLink(
                     urlConstructor.hhUrlNextPage(link.getUrl()),

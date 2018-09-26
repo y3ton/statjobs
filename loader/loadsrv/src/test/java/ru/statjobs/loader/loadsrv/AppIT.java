@@ -15,6 +15,7 @@ import ru.statjobs.loader.Consts;
 import ru.statjobs.loader.common.dao.RawDataStorageDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.url.UrlTypes;
+import ru.statjobs.loader.dao.HttpUtils;
 import ru.statjobs.loader.dao.RawDataStorageDaoHttpImpl;
 import ru.statjobs.loader.dao.RawDataStorageDaoJmsImpl;
 import ru.statjobs.loader.utils.JsonUtils;
@@ -26,10 +27,16 @@ import static org.mockito.Mockito.*;
 public class AppIT {
 
     static final JsonUtils jsonUtils = new JsonUtils();
+    static final HttpUtils httpUtils = new HttpUtils();
     static final BrokerService broker = new BrokerService();
     static final String endpointUrl = "http://127.0.0.1:"+  Consts.ENDPOINT_PORT +  Consts.ENDPOINT_URL;
 
-    RawDataStorageDaoHttpImpl daoHttp = new RawDataStorageDaoHttpImpl(jsonUtils, endpointUrl, "key");
+    RawDataStorageDaoHttpImpl daoHttp = new RawDataStorageDaoHttpImpl(
+            httpUtils,
+            jsonUtils,
+            endpointUrl,
+            "key"
+    );
 
     JndiContext jndiContext;
     CamelContext camelContext;

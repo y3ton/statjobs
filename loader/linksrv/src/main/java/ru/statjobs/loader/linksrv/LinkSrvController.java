@@ -8,6 +8,8 @@ import ru.statjobs.loader.linksrv.dao.RedisMap;
 import ru.statjobs.loader.linksrv.dao.RedisQueue;
 import ru.statjobs.loader.utils.JsonUtils;
 
+import java.util.List;
+
 @Service
 public class LinkSrvController implements DownloadableLinkDao {
 
@@ -38,6 +40,15 @@ public class LinkSrvController implements DownloadableLinkDao {
             redisQueue.push(QUEUE_NAME, json);
         }
         return true;
+    }
+
+    @Override
+    public boolean createDownloadableLinks(List<DownloadableLink> links) {
+        boolean b = true;
+        for (DownloadableLink link: links) {
+            b = createDownloadableLink(link) && b;
+        }
+        return b;
     }
 
     @Override

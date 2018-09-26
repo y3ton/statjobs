@@ -14,6 +14,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class HhListResumeHandler implements  LinkHandler  {
@@ -51,7 +52,7 @@ public class HhListResumeHandler implements  LinkHandler  {
         seleniumBrowser.get(link.getUrl());
         List<List<String>> list = (List<List<String>>) seleniumBrowser.execJs(jsScript.getResumeList());
         LOGGER.debug("url parse successful. Find {} resumes; elapsed time: {}", list.size(), System.currentTimeMillis() - getUrlStartTime);
-        list.stream()
+        List<DownloadableLink> links = list.stream()
                 .map(list2 -> {
                     Map<String, String> props = new HashMap();
                     props.put(ClientConsts.DATE_CREATE_RESUME, formatDate(list2.get(1)));
@@ -62,7 +63,8 @@ public class HhListResumeHandler implements  LinkHandler  {
                             UrlTypes.HH_RESUME,
                             props);
                 })
-                .forEach(downloadableLinkDao::createDownloadableLink);
+                .collect(Collectors.toList());
+        downloadableLinkDao.createDownloadableLinks(links);
 
         long i = (long) seleniumBrowser.execJs("return document.querySelectorAll('[data-qa=\"pager-next\"]').length");
         if (i > 0) {

@@ -1,7 +1,13 @@
 package ru.statjobs.loader.loadsrv;
 
+import com.amazon.sqs.javamessaging.ProviderConfiguration;
+import com.amazon.sqs.javamessaging.SQSConnectionFactory;
+import com.amazonaws.auth.PropertiesFileCredentialsProvider;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.jms.JmsComponent;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.util.jndi.JndiContext;
@@ -51,9 +57,6 @@ public class App {
             jndiContext.bind("postgresDao", postgresDao);
 
             camelContext = new DefaultCamelContext(jndiContext);
-/*
-            // ActiveMQ Connection
-            //ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(props.getProperty("ActiveMqRawDataUrl"));
             // AWS SQS Connection
             SQSConnectionFactory connectionFactory = new SQSConnectionFactory(
                     new ProviderConfiguration(),
@@ -63,10 +66,9 @@ public class App {
             );
             LOGGER.info("JMS factory created: {}", connection.getClass().getName());
             camelContext.addComponent("jms", JmsComponent.jmsComponentAutoAcknowledge(connectionFactory));
-            */
 
             /*start process*/
-            new App().createRoute(camelContext, props, false);
+            new App().createRoute(camelContext, props, true);
             camelContext.start();
 
             /* wait pres q */
@@ -117,6 +119,7 @@ public class App {
                                     .filter(header("Authorization").isEqualTo(props.getProperty("linksrvkey")))
                             )
                     )
+                    .threads(1)
                     .routeId("a")
                     .doTry()
                         .unmarshal().json(JsonLibrary.Jackson, RawData.class)

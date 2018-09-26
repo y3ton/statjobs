@@ -8,6 +8,7 @@ import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.utils.JsonUtils;
 
 import java.sql.*;
+import java.util.List;
 
 public class DownloadableLinkDaoPostgresImpl implements DownloadableLinkDao {
 
@@ -47,6 +48,15 @@ public class DownloadableLinkDaoPostgresImpl implements DownloadableLinkDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean createDownloadableLinks(List<DownloadableLink> links) {
+        boolean b = true;
+        for (DownloadableLink link: links) {
+            b = createDownloadableLink(link) && b;
+        }
+        return b;
     }
 
     private boolean isContainsDownloadableLink(DownloadableLink link) {

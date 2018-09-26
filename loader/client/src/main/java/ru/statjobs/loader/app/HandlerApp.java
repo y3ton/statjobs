@@ -10,7 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.statjobs.loader.*;
 import ru.statjobs.loader.common.dao.DownloadableLinkDao;
-import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
+import ru.statjobs.loader.common.dao.RawDataStorageDao;
+import ru.statjobs.loader.dao.DownloadableLinkDaoHttpImpl;
+import ru.statjobs.loader.dao.HttpUtils;
 import ru.statjobs.loader.dao.RawDataStorageDaoJmsImpl;
 import ru.statjobs.loader.url.UrlConstructor;
 import ru.statjobs.loader.utils.Downloader;
@@ -19,8 +21,6 @@ import ru.statjobs.loader.utils.JsonUtils;
 import ru.statjobs.loader.utils.PropertiesUtils;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
@@ -31,11 +31,7 @@ public class HandlerApp {
     private SeleniumBrowser seleniumBrowser;
     private LinkProcessor linkProcessor;
     private DownloadableLinkDao downloadableLinkDao;
-    //private RawDataStorageDaoPostgresImpl rawDataStorage;
-    private RawDataStorageDaoJmsImpl rawDataStorage;
-
-    private Connection dbConnection;
-
+    private RawDataStorageDao rawDataStorage;
 
     public static void main(String[] args) throws IOException, SQLException, InterruptedException {
         HandlerApp handlerApp = new HandlerApp();
@@ -58,11 +54,8 @@ public class HandlerApp {
     }
 
     private void init(Properties properties) throws SQLException {
-
-        dbConnection = DriverManager.getConnection(
-                properties.getProperty("url"),
-                properties.getProperty("user"),
-                properties.getProperty("password"));
+        JsonUtils jsonUtils = new JsonUtils();
+        HttpUtils httpUtils = new HttpUtils();
 
         SQSConnectionFactory connectionFactory = new SQSConnectionFactory(
                 new ProviderConfiguration(),
@@ -70,11 +63,14 @@ public class HandlerApp {
                         .withRegion(Regions.US_WEST_2)
                         .withCredentials(new PropertiesFileCredentialsProvider(properties.getProperty("awscredfile"))));
 
-        JsonUtils jsonUtils = new JsonUtils();
-
-        downloadableLinkDao = new DownloadableLinkDaoPostgresImpl(dbConnection, jsonUtils);
-        //rawDataStorage = new RawDataStorageDaoPostgresImpl(connection);
         rawDataStorage = new RawDataStorageDaoJmsImpl(connectionFactory, Consts.RAW_QUEUE_NAME,  jsonUtils);
+        downloadableLinkDao = new DownloadableLinkDaoHttpImpl(
+                httpUtils,
+                jsonUtils,
+                properties.getProperty("linksrv"),
+                properties.getProperty("linksrvkey")
+        );
+        ((DownloadableLinkDaoHttpImpl)downloadableLinkDao).start();
 
         seleniumBrowser = new SeleniumBrowser(
                 properties.getProperty("webdriverpath"),
@@ -93,18 +89,14 @@ public class HandlerApp {
     }
 
     private void close() {
+        if (downloadableLinkDao != null) {
+            ((DownloadableLinkDaoHttpImpl) downloadableLinkDao).stop();
+        }
         if (rawDataStorage != null) {
-            rawDataStorage.close();
+            ((RawDataStorageDaoJmsImpl) rawDataStorage).close();
         }
         if (seleniumBrowser != null) {
             seleniumBrowser.close();
-        }
-        if (dbConnection != null) {
-            try {
-                dbConnection.close();
-            } catch (SQLException e) {
-                LOGGER.error("fail close DB connection", e);
-            }
         }
     }
 

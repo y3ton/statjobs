@@ -8,8 +8,9 @@ import ru.statjobs.loader.common.dao.DownloadableLinkDao;
 import ru.statjobs.loader.common.dao.HhDictionaryDao;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.dto.HhDictionary;
-import ru.statjobs.loader.dao.DownloadableLinkDaoPostgresImpl;
+import ru.statjobs.loader.dao.DownloadableLinkDaoHttpImpl;
 import ru.statjobs.loader.dao.HhDictionaryDaoImpl;
+import ru.statjobs.loader.dao.HttpUtils;
 import ru.statjobs.loader.url.InitUrlCreator;
 import ru.statjobs.loader.url.UrlConstructor;
 import ru.statjobs.loader.utils.FileUtils;
@@ -17,14 +18,10 @@ import ru.statjobs.loader.utils.JsonUtils;
 import ru.statjobs.loader.utils.PropertiesUtils;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class InitApp {
 
@@ -32,6 +29,7 @@ public class InitApp {
 
     private UrlConstructor urlConstructor;
     private JsonUtils jsonUtils;
+    HttpUtils httpUtils;
     private DownloadableLinkDao qownloadableLinkDao;
 
     private HhDictionaryDao hhDictionaryDao;
@@ -49,11 +47,18 @@ public class InitApp {
         initApp.process(props);
     }
 
-    private void init(Connection connection) {
+    private void init( Properties props) {
         urlConstructor = new UrlConstructor();
         jsonUtils = new JsonUtils();
+        httpUtils = new HttpUtils();
         fileUtils = new FileUtils();
-        qownloadableLinkDao = new DownloadableLinkDaoPostgresImpl(connection, jsonUtils);
+        qownloadableLinkDao = new DownloadableLinkDaoHttpImpl(
+                httpUtils,
+                jsonUtils,
+                props.getProperty("linksrv"),
+                props.getProperty("linksrvkey")
+        );
+        ((DownloadableLinkDaoHttpImpl)qownloadableLinkDao).start();
         hhDictionaryDao = new HhDictionaryDaoImpl(jsonUtils, fileUtils);
         specialization = hhDictionaryDao.getSpecialization();
         cities = hhDictionaryDao.getCity();
@@ -62,24 +67,17 @@ public class InitApp {
         initUrlCreator = new InitUrlCreator();
     }
 
-    private void process(Properties properties) {
-        LOGGER.info("connect to DB. url: {}", properties.getProperty("url"));
-        try (Connection connection = DriverManager.getConnection(
-                properties.getProperty("url"),
-                properties.getProperty("user"),
-                properties.getProperty("password")))
-        {
-            init(connection);
-            int sequenceNum = (int) Instant.now().getEpochSecond();
-            LOGGER.info("sequenceNum: {}", sequenceNum);
-            List<DownloadableLink> firstLink = new ArrayList<>();
-            firstLink.addAll(initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, ClientConsts.HH_PER_PAGE, cities, specialization, experience, industries));
-            firstLink.addAll(initUrlCreator.initHhItResumeLink(urlConstructor, sequenceNum, ClientConsts.HH_PER_PAGE, cities, specialization, ClientConsts.HH_SEARCH_PERIOD));
-            firstLink.forEach(qownloadableLinkDao::createDownloadableLink);
-            LOGGER.info("create {} link", firstLink.size());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    private void process(Properties props) {
+        init(props);
+        int sequenceNum = (int) Instant.now().getEpochSecond();
+        LOGGER.info("sequenceNum: {}", sequenceNum);
+        List<DownloadableLink> links = new ArrayList<>();
+        links.addAll(initUrlCreator.initHhItVacancyLink(urlConstructor, sequenceNum, ClientConsts.HH_PER_PAGE, cities, specialization, experience, industries));
+        links.addAll(initUrlCreator.initHhItResumeLink(urlConstructor, sequenceNum, ClientConsts.HH_PER_PAGE, cities, specialization, ClientConsts.HH_SEARCH_PERIOD));
+        Collections.shuffle(links);
+        qownloadableLinkDao.createDownloadableLinks(links);
+        LOGGER.info("create {} link", links.size());
+        ((DownloadableLinkDaoHttpImpl)qownloadableLinkDao).stop();
     }
 
 

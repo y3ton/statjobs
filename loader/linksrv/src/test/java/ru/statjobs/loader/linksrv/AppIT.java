@@ -8,38 +8,39 @@ import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.Server;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import redis.clients.jedis.Jedis;
 import ru.statjobs.loader.common.dto.DownloadableLink;
 import ru.statjobs.loader.common.url.UrlTypes;
 import ru.statjobs.loader.dao.DownloadableLinkDaoHttpImpl;
+import ru.statjobs.loader.dao.HttpUtils;
 import ru.statjobs.loader.utils.JsonUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AppIT {
 
-    static Server server;
-    static RedisServer redisServer;
-    static HttpClient httpClient;
-    static Jedis jedis;
-    static DownloadableLinkDaoHttpImpl daoHttp;
+    Server server;
+    RedisServer redisServer;
+    HttpClient httpClient;
+    Jedis jedis;
+    DownloadableLinkDaoHttpImpl daoHttp;
 
-    @BeforeClass
-    public static void init() throws Exception {
+    @Before
+    public void init() throws Exception {
         redisServer = RedisServer.newRedisServer();
         redisServer.start();
         jedis = new Jedis("127.0.0.1", redisServer.getBindPort());
         httpClient = new HttpClient();
         httpClient.start();
         server = App.createServer("127.0.0.1", redisServer.getBindPort(), "authkey");
-        daoHttp = new DownloadableLinkDaoHttpImpl(new JsonUtils(), "http://localhost:8080/linksrv", "authkey");
+        daoHttp = new DownloadableLinkDaoHttpImpl(new HttpUtils(), new JsonUtils(), "http://localhost:8080/linksrv", "authkey");
         daoHttp.start();
     }
 
-    @AfterClass
-    public static void close() throws Exception {
+    @After
+    public void close() throws Exception {
         httpClient.stop();
         redisServer.stop();
         jedis.close();
@@ -75,9 +76,36 @@ public class AppIT {
     }
 
     @Test
+    public void batchCreateMethodTest() {
+
+        List<DownloadableLink> list = new ArrayList<>();
+        for (int i = 0; i < 156; i++) {
+            list.add(new DownloadableLink("batchCreateMethodTestURL", i, UrlTypes.HH_RESUME, null));
+        }
+        daoHttp.createDownloadableLinks(list);
+        for (int i = 0; i < 156; i++) {
+            Assert.assertTrue(jedis.get("P:" + i + ":batchCreateMethodTestURL").contains("batchCreateMethodTestURL"));
+        }
+
+        list = new ArrayList<>();
+        list.add(new DownloadableLink("oneTestUrl", 0, UrlTypes.HH_RESUME, null));
+        daoHttp.createDownloadableLinks(list);
+        Assert.assertTrue(jedis.get("P:0:oneTestUrl").contains("oneTestUrl"));
+
+        List<DownloadableLink> list1 = new ArrayList<>();
+        for (int i = 100; i < 200; i++) {
+            list1.add(new DownloadableLink("batchCreateMethodTestURL", i, UrlTypes.HH_RESUME, null));
+        }
+        daoHttp.createDownloadableLinks(list1);
+        for (int i = 100; i < 200; i++) {
+            Assert.assertTrue(jedis.get("P:" + i + ":batchCreateMethodTestURL").contains("batchCreateMethodTestURL"));
+        }
+    }
+
+    @Test
     public void integrationWithDaoFailAuthTest() {
         DownloadableLinkDaoHttpImpl daoHttpFail =
-                new DownloadableLinkDaoHttpImpl(new JsonUtils(), "http://localhost:8080/linksrv", "");
+                new DownloadableLinkDaoHttpImpl(new HttpUtils(), new JsonUtils(), "http://localhost:8080/linksrv", "");
         daoHttpFail.start();
         try {
             daoHttpFail.getDownloadableLink();

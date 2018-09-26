@@ -8,9 +8,7 @@ import ru.statjobs.loader.utils.JsonUtils;
 
 import java.io.FileNotFoundException;
 import java.sql.*;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DownloadableLinkDaoPostgresImplIT {
 
@@ -109,6 +107,52 @@ public class DownloadableLinkDaoPostgresImplIT {
         Assert.assertEquals ("1", map.get("prop1"));
         Assert.assertEquals ("2", map.get("prop2"));
 
+        Assert.assertFalse(resultSet.next());
+        resultSet.close();
+        statement.close();
+    }
+
+
+    @Test
+    public void createBatchDownloadableLinkTest() throws SQLException {
+
+        Map<String, String> props = new HashMap();
+        props.put("prop1", "1");
+        props.put("prop2", "2");
+        List<DownloadableLink> list = new ArrayList<>();
+        for (int i = 0; i < 243; i++) {
+            list.add(new DownloadableLink("urlCBDLT", i, UrlTypes.HH_VACANCY, props));
+        }
+        List<DownloadableLink> list2 = new ArrayList<>();
+        list2.add(new DownloadableLink("urlCBDLT", 13, UrlTypes.HH_VACANCY, props));
+        list2.add(new DownloadableLink("urlCBDLT", 11002, UrlTypes.HH_VACANCY, props));
+        list2.add(new DownloadableLink("urlCBDLT", 11001, UrlTypes.HH_VACANCY, props));
+
+        Assert.assertTrue(dao.createDownloadableLinks(list));
+        Assert.assertFalse(dao.createDownloadableLinks(list2));
+        Assert.assertFalse(dao.createDownloadableLinks(list2));
+
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("select * from T_QUEUE_DOWNLOADABLE_LINK order by SEQUENCE_NUM");
+        for (int i = 0; i < 243; i++) {
+            Assert.assertTrue(resultSet.next());
+            //HANDLER_NAME, URL, DATE_CREATE, SEQUENCE_NUM, IS_DELETE
+            Assert.assertEquals(UrlTypes.HH_VACANCY.name(), resultSet.getString("HANDLER_NAME"));
+            Assert.assertEquals("urlCBDLT", resultSet.getString("URL"));
+            Assert.assertEquals(i, resultSet.getInt("SEQUENCE_NUM"));
+            Assert.assertNotNull(resultSet.getTimestamp("DATE_CREATE"));
+            Assert.assertNull(resultSet.getTimestamp("DATE_PROCESS"));
+            Assert.assertFalse(resultSet.getBoolean("IS_DELETE"));
+            Map<String, String> map = jsonUtils.readString(resultSet.getString("PROPS"));
+            Assert.assertNotNull(map);
+            Assert.assertEquals(2, map.size());
+            Assert.assertEquals("1", map.get("prop1"));
+            Assert.assertEquals("2", map.get("prop2"));
+        }
+        Assert.assertTrue(resultSet.next());
+        Assert.assertEquals(11001, resultSet.getInt("SEQUENCE_NUM"));
+        Assert.assertTrue(resultSet.next());
+        Assert.assertEquals(11002, resultSet.getInt("SEQUENCE_NUM"));
         Assert.assertFalse(resultSet.next());
         resultSet.close();
         statement.close();

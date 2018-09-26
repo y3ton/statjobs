@@ -9,6 +9,7 @@ import ru.statjobs.loader.common.dto.DownloadableLink;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 @Controller
 @RequestMapping("/linksrv")
@@ -24,6 +25,15 @@ public class LinkSrvView implements DownloadableLinkDao {
     @Consumes(MediaType.APPLICATION_JSON)
     public boolean createDownloadableLink(@RequestBody DownloadableLink link) {
         return controller.createDownloadableLink(link);
+    }
+
+    @Override
+    @PostMapping(value = "/createlist")
+    @ResponseBody
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public boolean createDownloadableLinks(@RequestBody List<DownloadableLink> links) {
+        return controller.createDownloadableLinks(links);
     }
 
     @Override
