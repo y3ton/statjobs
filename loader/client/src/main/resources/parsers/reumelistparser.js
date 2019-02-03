@@ -8,9 +8,6 @@ findText = (selector, element) => {
 }
 
 findResumes = () => findObj('[data-qa="resume-serp__resume"]', document).map(element => {
-    var e = findObj('[data-qa="resume-serp__resume-title"]', element);
-    if (!e || e.length == 0) {
-        e = findObj('[data-qa="resume-serp__resume-title search-item-name_marked"]', element);
-    }
+    var e = findObj('[itemprop="jobTitle"]', element);
     return [e[0].href, findText('[class="output__tab m-output__date"]', element)]
 })

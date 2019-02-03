@@ -33,7 +33,7 @@ public class HandlerApp {
     private DownloadableLinkDao downloadableLinkDao;
     private RawDataStorageDao rawDataStorage;
 
-    public static void main(String[] args) throws IOException, SQLException, InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
         HandlerApp handlerApp = new HandlerApp();
         Properties props = new PropertiesUtils().loadProperties(Consts.PROPERTIES_FILE);
         for (int i = 0; i < ClientConsts.HANDLER_RESTART_ATTEMPT; i++) {

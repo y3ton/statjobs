@@ -41,7 +41,7 @@ public class InitApp {
     private FileUtils fileUtils;
 
 
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) {
         InitApp initApp = new InitApp();
         Properties props = new PropertiesUtils().loadProperties(Consts.PROPERTIES_FILE);
         initApp.process(props);
