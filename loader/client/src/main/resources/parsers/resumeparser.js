@@ -49,7 +49,7 @@ parseResume = () => {
                          findTextContains('[class="bloko-columns-row"]', document, "Work experience ")).trim(),
 
 	language: 			findObj('[data-qa="resume-block-language-item"]', document).map(item => item.innerText),
-	skils: 				findObj('[class="Bloko-TagList-Text"]', document).map(item => item.innerText),
+	skils: 				findObj('[data-qa="bloko-tag__text"]', document).map(item => item.innerText),
 	about: 				findText('[data-qa="resume-block-skills"]', document),
 	driver: 			findText('[data-qa="resume-block-driver-experience"]', document),
 
@@ -57,7 +57,8 @@ parseResume = () => {
 
 	experiencedetail: findObj('[itemprop="worksFor"]', document).map(item => {
                 return {
-                               duration:    findObj( '[class="bloko-column bloko-column_s-2 bloko-column_m-2 bloko-column_l-2"]', item)[0].innerText,
+                               period:      findObj( '[class="bloko-column bloko-column_xs-4 bloko-column_s-2 bloko-column_m-2 bloko-column_l-2"]', item)[0].innerText.split("\n")[0],
+                               duration:    findObj( '[class="resume-block__experience-timeinterval"]', item)[0].innerText,
                                company:     findText('[class="resume-block__sub-title"]', item),
                                address:     findText('[itemprop="address"]', item),
                                url:         findText('[class="resume__experience-url"]', item),
@@ -70,7 +71,7 @@ parseResume = () => {
 	educationadd: findObj('[class="resume-block-item-gap"]', findObj('[data-qa="resume-block-additional-education"]', document)[0])
 		.map(item => {
 			return {
-				year : findText('[class="bloko-column bloko-column_s-2 bloko-column_m-2 bloko-column_l-2"]', item),
+				year : findText('[class="bloko-column bloko-column_xs-4 bloko-column_s-2 bloko-column_m-2 bloko-column_l-2"]', item),
 				name : findText('[data-qa="resume-block-education-name"]', item),
 				organization : findText('[data-qa="resume-block-education-organization"]', item),
 			}
