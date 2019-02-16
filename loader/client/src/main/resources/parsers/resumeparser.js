@@ -80,7 +80,7 @@ parseResume = () => {
 	education: findObj('[class="bloko-columns-row"]', findObj('[data-qa="resume-block-education"]', document)[0])
 		.map(item => {
 			return {
-				year: findText('[class="bloko-column bloko-column_s-2 bloko-column_m-2 bloko-column_l-2"]', item),
+				year: findText('[class="bloko-column bloko-column_xs-4 bloko-column_s-2 bloko-column_m-2 bloko-column_l-2"]', item),
 				name: findText('[data-qa="resume-block-education-name"]', item),
 				organization: findText('[data-qa="resume-block-education-organization"]', item)
 			}
@@ -89,7 +89,7 @@ parseResume = () => {
 	educationexam: findObj('[class="bloko-columns-row"]', findObj('[data-qa="resume-block-attestation-education"]', document)[0])
 		.map(item => {
 			return {
-				year: findText('[class="bloko-column bloko-column_s-2 bloko-column_m-2 bloko-column_l-2"]', item),
+				year: findText('[class="bloko-column bloko-column_xs-4 bloko-column_s-2 bloko-column_m-2 bloko-column_l-2"]', item),
 				name: findText('[data-qa="resume-block-education-name"]', item),
 				organization: findText('[data-qa="resume-block-education-organization"]', item)
 			}
